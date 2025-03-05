@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import "./AuthForm.css"; // Import external CSS for styling
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // Import icons for better UI
+import { useNavigate } from "react-router-dom";
 
 // Authentication Form Component
 const AuthForm = () => {
@@ -13,6 +14,8 @@ const AuthForm = () => {
   const [showPassword, setShowPassword] = useState(false); // Controls password visibility toggle
   const [showPopup, setShowPopup] = useState(false); // Controls popup notification visibility
   const [popupMessage, setPopupMessage] = useState(""); // Stores popup message text
+
+  const navigate = useNavigate(); // Initialize navigate function
 
   // Function to toggle between Sign In & Sign Up modes
   const toggleMode = () => {
@@ -46,14 +49,15 @@ const AuthForm = () => {
     // Show the popup notification
     setShowPopup(true);
 
-    // Hide the popup after 3 seconds
-    setTimeout(() => {
-      setShowPopup(false);
-    }, 3000);
-
     // Log the submitted credentials to the console
     console.log(isSignUp ? "Signing Up..." : "Signing In...");
     console.log({ name, email, password });
+
+    // Redirect to Task Management Page after 3 seconds
+    setTimeout(() => {
+      setShowPopup(false);
+      navigate("/tasks"); // ✅ Redirect after successful authentication
+    }, 3000);
   };
 
   return (
