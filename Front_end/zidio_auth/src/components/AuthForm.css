@@ -1,0 +1,310 @@
+/* ============================= */
+/* GENERAL STYLES */
+/* ============================= */
+
+/* Apply general styles to the body */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+}
+
+/* ============================= */
+/* AUTHENTICATION CONTAINER */
+/* ============================= */
+
+/* Main container holding both left and right sections */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 900px;
+    background: rgba(255, 255, 255, 0.9); /* Adds slight transparency */
+    padding: 20px;
+    border-radius: 10px;
+    gap: 40px; /* Adds spacing between left and right sections */
+}
+
+/* ============================= */
+/* LEFT SECTION - INTRO TEXT */
+/* ============================= */
+
+/* Left side content styling */
+.auth-left {
+    flex: 1;
+    text-align: left;
+    padding: 20px;
+}
+
+/* Main title inside the left section */
+.auth-left h2 {
+    margin: 5px 0;
+    font-size: 3rem;
+    color: rgb(47, 47, 247);
+    font-weight: bold;
+}
+
+/* Tagline with animated color cycling */
+.auth-tagline {
+    padding: 3px 10px;
+    border: 1px solid black;
+    border-radius: 10px;
+    animation: colorCycle 5s infinite linear;
+}
+
+/* ============================= */
+/* RIGHT SECTION - AUTH BOX */
+/* ============================= */
+
+/* Container for form elements */
+.auth-box {
+    background: #fff;
+    flex: 1;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 8px 4px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+/* Form title */
+h2 {
+    color: rgb(47, 47, 247);
+    font-size: 24px;
+}
+
+/* ============================= */
+/* FORM INPUT STYLES */
+/* ============================= */
+
+/* Input field container */
+.input-group {
+    display: flex;
+    align-items: center;
+    background: #eaeaea;
+    margin: 15px 0; /* Adds spacing between inputs */
+    border-radius: 5px;
+    padding: 10px;
+    position: relative;
+}
+
+/* Input field styles */
+.input-group input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 10px;
+    font-size: 16px;
+    outline: none;
+    color: black;
+    font-weight: bold;
+}
+
+/* Icons inside input fields */
+.icon {
+    margin-right: 10px;
+    color: gray;
+}
+
+/* Toggle password button inside input field */
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: gray;
+}
+
+/* ============================= */
+/* BUTTON & LINK STYLES */
+/* ============================= */
+
+/* Submit button */
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+    background: rgb(47, 47, 247);
+    color: white;
+}
+
+/* Switch between Sign In & Sign Up */
+.switch-mode {
+    font-size: 14px;
+    color: rgb(47, 47, 247);
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* Forgot password link */
+.forgot-password {
+    font-size: 12px;
+    color: gray;
+    cursor: pointer;
+}
+
+/* Change color on hover */
+.forgot-password span {
+    color: rgb(96, 96, 249);
+}
+
+.forgot-password:hover span {
+    color: rgb(0, 0, 255);
+}
+
+/* ============================= */
+/* RESPONSIVE DESIGN */
+/* ============================= */
+
+/* Adjustments for tablets & smaller screens */
+@media (max-width: 768px) {
+    .auth-container {
+        flex-direction: column; /* Stack elements vertically */
+        width: 90%;
+        gap: 20px;
+        margin-top: 2rem;
+    }
+
+    .auth-left {
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    .auth-box {
+        width: 100%;
+    }
+}
+
+/* Adjustments for mobile screens */
+@media (max-width: 468px) {
+    .input-group {
+        margin: 10px 0;
+        padding: 5px;
+    }
+
+    .input-group input {
+        padding: 5px;
+        font-size: 13px;
+    }
+
+    .auth-box {
+        padding: 10px;
+    }
+}
+
+/* ============================= */
+/* ANIMATIONS */
+/* ============================= */
+
+/* Fade-in animation for left section */
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Fade-in animation for right section */
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Apply animations */
+.auth-left {
+    animation: fadeInLeft 0.8s ease-in-out;
+}
+
+.auth-box {
+    animation: fadeInRight 0.8s ease-in-out;
+    animation-delay: 0.5s;
+    opacity: 0;
+    animation-fill-mode: forwards;
+}
+
+/* Animated text color cycling */
+@keyframes colorCycle {
+    0% { color: #5A189A; }
+    25% { color: #8f0097; }
+    50% { color: #FF6D00; }
+    75% { color: #D00000; }
+    100% { color: #027604; }
+}
+
+/* Floating animation for the title */
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}
+
+.auth-title {
+    animation: float 3s infinite ease-in-out;
+}
+
+/* ============================= */
+/* POPUP MESSAGE ANIMATION */
+/* ============================= */
+
+/* Fade-in and fade-out animation for notifications */
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-20px); }
+    20% { opacity: 1; transform: translateY(0); }
+    80% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Popup notification styling */
+.popup {
+    position: fixed;
+    top: 2%;
+    left: auto;
+    transform: translateX(-50%);
+    background-color: #1f1f1f;
+    color: #fff;
+    padding: 7px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    animation: fadeInOut 3s ease-in-out;
+    z-index: 1000;
+}
+
+/* Responsive popup adjustments */
+@media (max-width: 480px) {
+    .popup {
+        left: auto;
+        font-size: 10px;
+        padding: 5px 10px;
+        top: 2%;
+    }
+}
+
+@media (max-width: 678px) {
+    .popup {
+        left: auto;
+        max-width: 350px;
+        font-size: 12px;
+        padding: 6px 12px;
+        top: 4%;
+    }
+}
