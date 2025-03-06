@@ -1,25 +1,23 @@
 /* Task Management Layout */
 .task-container {
-  display: flex;
-  height: 100vh;
-  width: 99vw;
-  background: #e6f3fc;
-  font-family: Arial, sans-serif;
+  display: flex; /* Layout with sidebar and main content */
+  height: 100vh; /* Full viewport height */
+  width: 99vw; /* Almost full viewport width */
+  background: #e6f3fc; /* Light blue background */
+  font-family: Arial, sans-serif; /* Font styling */
   overflow: hidden; /* Prevents entire page from scrolling */
 }
 
-
 /* Sidebar - Full Left Side */
 .sidebar {
-  width: 220px;
-  background: white;
+  width: 220px; /* Fixed sidebar width */
+  background: white; /* White background for contrast */
   padding: 20px;
   display: flex;
-  flex-direction: column;
-  gap: 15px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  flex-direction: column; /* Stacks elements vertically */
+  gap: 15px; /* Space between elements */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
 }
-
 
 .sidebar h2 {
   font-size: 18px;
@@ -38,18 +36,18 @@
 }
 
 .sidebar .active {
-  background: #b2dffc;
+  background: #b2dffc; /* Highlight active section */
   border-radius: 5px;
 }
 
 /* Main Content */
 .main-content {
-  flex: 1;
+  flex: 1; /* Takes up remaining space */
   display: flex;
   flex-direction: column;
   padding: 0;
   overflow-y: auto; /* Enables scrolling */
-  margin-top: 70px; /* Add space below the fixed header */
+  margin-top: 70px; /* Space below fixed header */
 }
 
 /* Top Header (Search Bar & Profile) */
@@ -60,28 +58,29 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  position: fixed; /* Header stays fixed */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  position: fixed; /* Header stays fixed on scroll */
   top: 0;
-  z-index: 1000;
+  z-index: 1000; /* Ensures header stays on top */
 }
 
-
+/* Search Bar Styling */
 .search-box {
   display: flex;
   align-items: center;
-  background: #f0f0f0;
+  background: #f0f0f0; /* Light gray background */
   padding: 8px 12px;
-  border-radius: 20px;
+  border-radius: 20px; /* Rounded corners */
 }
 
 .search-box input {
   border: none;
   outline: none;
   margin-left: 5px;
-  background: transparent;
+  background: transparent; /* Blends with background */
 }
 
+/* Profile Section (Notification & Profile Picture) */
 .profile-section {
   display: flex;
   align-items: center;
@@ -95,16 +94,15 @@
 .profile-pic {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
+  border-radius: 50%; /* Circular profile picture */
+  object-fit: cover; /* Ensures image fills the space */
 }
 
-/* Task Grid */
+/* Task Grid Layout */
 .task-grid {
-
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  grid-template-columns: repeat(3, 1fr); /* 3-column layout */
+  gap: 15px; /* Space between task cards */
   padding: 20px;
 }
 
@@ -112,14 +110,14 @@
 .task-card {
   background: white;
   padding: 15px;
-  border-radius: 10px;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
 }
 
+/* Task Actions (Edit & Delete Icons) */
 .task-actions {
   display: flex;
-  justify-content: flex-end;
-
+  justify-content: flex-end; /* Aligns icons to the right */
 }
 
 .edit-icon,
@@ -129,30 +127,29 @@
 }
 
 .delete-icon {
-  color: rgb(249, 81, 81);
+  color: rgb(249, 81, 81); /* Red color for delete button */
 }
 
-/* Empty Task Cards for Layout */
+/* Empty Task Cards for Layout Consistency */
 .empty-card {
   background: white;
   border-radius: 10px;
-  height: 120px;
+  height: 120px; /* Placeholder height */
 }
 
-/* Add Task Button */
+/* Add Task Button (Floating Action Button) */
 .add-task-btn {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: #b2dffc;
+  background: #b2dffc; /* Light blue background */
   border: none;
   width: 60px;
   height: 60px;
-  border-radius: 50%;
+  border-radius: 50%; /* Circular button */
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
   cursor: pointer;
 }
-
