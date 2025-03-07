@@ -1,74 +1,155 @@
-.container {
-  max-width: 600px;
-  margin: auto;
-  font-family: Arial, sans-serif;
-  color: #333;
+/* Task Management Layout */
+.task-container {
+  display: flex; /* Layout with sidebar and main content */
+  height: 100vh; /* Full viewport height */
+  width: 99vw; /* Almost full viewport width */
+  background: #e6f3fc; /* Light blue background */
+  font-family: Arial, sans-serif; /* Font styling */
+  overflow: hidden; /* Prevents entire page from scrolling */
 }
 
-.header {
+/* Sidebar - Full Left Side */
+.sidebar {
+  width: 220px; /* Fixed sidebar width */
+  background: white; /* White background for contrast */
+  padding: 20px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid #ddd;
+  flex-direction: column; /* Stacks elements vertically */
+  gap: 15px; /* Space between elements */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
 }
 
-.profile {
-  display: flex;
-  align-items: center;
+.sidebar h2 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: black;
 }
 
-.icon {
-  font-size: 40px;
-  margin-right: 10px;
-  color: #555;
-}
-
-.logout-btn {
+.sidebar button {
   background: none;
   border: none;
-  cursor: pointer;
-  color: #d9534f;
   font-size: 16px;
+  text-align: left;
+  padding: 10px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
-.task-form {
-  padding: 20px;
+.sidebar .active {
+  background: #b2dffc; /* Highlight active section */
+  border-radius: 5px;
 }
 
-.task-form input {
-  display: block;
-  width: 100%;
-  padding: 8px;
-  margin: 8px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+/* Main Content */
+.main-content {
+  flex: 1; /* Takes up remaining space */
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow-y: auto; /* Enables scrolling */
+  margin-top: 70px; /* Space below fixed header */
 }
 
-.date-group {
+/* Top Header (Search Bar & Profile) */
+.top-header {
+  width: 80vw;
+  background: white;
+  padding: 15px 20px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  position: fixed; /* Header stays fixed on scroll */
+  top: 0;
+  z-index: 1000; /* Ensures header stays on top */
 }
 
-.submit-btn {
-  width: 100%;
-  background-color: #28a745;
-  color: white;
-  padding: 10px;
+/* Search Bar Styling */
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #f0f0f0; /* Light gray background */
+  padding: 8px 12px;
+  border-radius: 20px; /* Rounded corners */
+}
+
+.search-box input {
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 10px;
+  outline: none;
+  margin-left: 5px;
+  background: transparent; /* Blends with background */
 }
 
-.task-list {
+/* Profile Section (Notification & Profile Picture) */
+.profile-section {
+  display: flex;
+  align-items: center;
+}
+
+.notification-icon {
+  font-size: 18px;
+  margin-right: 15px;
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* Circular profile picture */
+  object-fit: cover; /* Ensures image fills the space */
+}
+
+/* Task Grid Layout */
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3-column layout */
+  gap: 15px; /* Space between task cards */
   padding: 20px;
 }
 
-.task-item {
-  background: #f9f9f9;
-  padding: 10px;
-  margin-top: 10px;
-  border-left: 4px solid #28a745;
-  border-radius: 4px;
+/* Task Cards */
+.task-card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+/* Task Actions (Edit & Delete Icons) */
+.task-actions {
+  display: flex;
+  justify-content: flex-end; /* Aligns icons to the right */
+}
+
+.edit-icon,
+.delete-icon {
+  cursor: pointer;
+  padding: 5px;
+}
+
+.delete-icon {
+  color: rgb(249, 81, 81); /* Red color for delete button */
+}
+
+/* Empty Task Cards for Layout Consistency */
+.empty-card {
+  background: white;
+  border-radius: 10px;
+  height: 120px; /* Placeholder height */
+}
+
+/* Add Task Button (Floating Action Button) */
+.add-task-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #b2dffc; /* Light blue background */
+  border: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%; /* Circular button */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
 }
