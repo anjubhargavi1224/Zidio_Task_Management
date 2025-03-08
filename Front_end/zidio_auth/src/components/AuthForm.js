@@ -11,6 +11,7 @@ const AuthForm = () => {
   const [email, setEmail] = useState(""); // Stores the email input value
   const [password, setPassword] = useState(""); // Stores the password input value
   const [name, setName] = useState(""); // Stores the name input value (only for Sign Up)
+  const [role, setRole] = useState("user"); //default role : user
   const [showPassword, setShowPassword] = useState(false); // Controls password visibility toggle
   const [showPopup, setShowPopup] = useState(false); // Controls popup notification visibility
   const [popupMessage, setPopupMessage] = useState(""); // Stores popup message text
@@ -50,14 +51,18 @@ const AuthForm = () => {
     setShowPopup(true);
 
     // Log the submitted credentials to the console
-    console.log(isSignUp ? "Signing Up..." : "Signing In...");
-    console.log({ name, email, password });
+    console.log(isSignUp ? "Signing Up..." : "Loggin...");
+    console.log({ name, email, password, role});
 
-    // Redirect to Task Management Page after 3 seconds
+    // Redirect to Task Management Page after 1 seconds
     setTimeout(() => {
       setShowPopup(false);
-      navigate("/tasks"); // ✅ Redirect after successful authentication
-    }, 3000);
+      if(role === "admin"){
+        navigate("/admin");
+      }else{
+        navigate("/tasks"); // ✅ Redirect after successful authentication
+      }
+    }, 1000);
   };
 
   return (
@@ -73,7 +78,7 @@ const AuthForm = () => {
 
       {/* Right Side Authentication Box */}
       <div className="auth-box">
-        <h2>{isSignUp ? "Sign Up" : "Sign In"}</h2>
+        <h2>{isSignUp ? "Sign Up" : "Login"}</h2>
 
         {/* Authentication Form */}
         <form onSubmit={handleSubmit}>
@@ -123,6 +128,16 @@ const AuthForm = () => {
             </span>
           </div>
 
+          {/* Role Selection Dropdown */}
+            <div className="input-group">
+              <label className="role-label">{isSignUp ? " Register as:" : "Login as:"}</label>
+              <select value={role} onChange={(e) => setRole(e.target.value)}>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+
+
           {/* Forgot Password Link (Only for Sign In Mode) */}
           {!isSignUp && (
             <p className="forgot-password">
@@ -132,13 +147,13 @@ const AuthForm = () => {
 
           {/* Submit Button */}
           <button type="submit" className="submit-btn">
-            {isSignUp ? "Sign Up" : "Sign In"}
+            {isSignUp ? "Sign Up" : "Login"}
           </button>
         </form>
 
         {/* Switch Between Sign In and Sign Up */}
         <p className="switch-mode" onClick={toggleMode}>
-          {isSignUp ? "Already have an account? Sign In" : "New user? Sign Up"}
+          {isSignUp ? "Already have an account? Login" : "New user? Sign Up"}
         </p>
       </div>
 
