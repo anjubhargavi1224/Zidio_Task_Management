@@ -121,6 +121,64 @@ h2 {
 }
 
 /* ============================= */
+/* login as admin or user */
+/* ============================= */
+/* Styling for the input group */
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+    position: relative;
+  }
+  
+  /* Label Styling */
+  .role-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    min-width: 80px;
+  }
+  
+  /* Dropdown Styling */
+  select {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+  }
+  
+  /* Change border color on focus */
+  select:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  /* Styling the dropdown arrow */
+  select::-ms-expand {
+    display: none;
+  }
+  
+  select:hover {
+    border-color: #0056b3;
+  }
+  
+  /*smooth transition effect */
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'><path fill='%23007bff' d='M2 0L0 2h4z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+    padding-right: 30px;
+  }
+  
+
+/* ============================= */
 /* BUTTON & LINK STYLES */
 /* ============================= */
 

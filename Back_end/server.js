@@ -25,5 +25,4 @@ app.get("/", (req, res) => {
   res.send("Todo Backend Running");
 });
 
-
 app.use("/auth", authRoutes);
