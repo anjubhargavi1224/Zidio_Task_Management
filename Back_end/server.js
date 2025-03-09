@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
 import authRoutes from'./routes/loginauth.js';
+import adminauth from'./routes/adminauth.js';
 
 
 dotenv.config();
@@ -25,4 +26,5 @@ app.get("/", (req, res) => {
   res.send("Todo Backend Running");
 });
 
-app.use("/auth", authRoutes);
+app.use("/user_auth", authRoutes);
+app.use("/admin_auth", adminauth);
