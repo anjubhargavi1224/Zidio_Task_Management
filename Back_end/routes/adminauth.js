@@ -28,7 +28,7 @@ router.post("/register", async (req, res) => {
             role: "admin", // Set role as admin
         });
 
-        res.status(201).json({ message: "Admin registered successfully" });
+        res.status(201).json({ newAdmin,message: "Admin registered successfully" });
     }
     } catch (error) {
         res.status(500).json({ error: error.message });
