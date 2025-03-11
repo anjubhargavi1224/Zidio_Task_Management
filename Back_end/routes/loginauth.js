@@ -4,7 +4,7 @@ const router = require("express").Router();
 
 router.post("/register", async (req, res) => {
     try {
-        const { username, password, email } = req.body;
+        const { username, password, email,role } = req.body;
         const user = await User.findOne({ email: email });
         if (user) {
             return res.status(400).json("User already exists");
@@ -14,6 +14,7 @@ router.post("/register", async (req, res) => {
                 username,
                 password: hashedPassword,
                 email,
+                role
             };
             const newUser = await User.create(newUserData);
             res.status(201).json(newUser);
@@ -27,22 +28,14 @@ router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email: email });
-
         if (!user) {
             return res.status(400).json("User not found");
         }
-
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(400).json("Invalid credentials");
         }
-
-        // Send user details in response
-        res.status(200).json({
-            message: "Login successful",
-            user: { username: user.username, email: user.email },
-        });
-
+        res.status(200).json("Login successful");
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
