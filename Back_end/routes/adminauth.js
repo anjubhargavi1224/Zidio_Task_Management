@@ -1,4 +1,4 @@
-const User = require("../models/User");
+const Admin = require("../models/Admin");
 const bcrypt = require("bcrypt");
 const router = require("express").Router();
 
@@ -6,14 +6,12 @@ const router = require("express").Router();
 // **Admin Signup**
 router.post("/register", async (req, res) => {
     try {
-        const { username, password, email } = req.body;
+        const { username, password, email, role } = req.body;
 
-        // Normalize email
-        const normalizedEmail = email.toLowerCase();
 
         // Check if admin already exists
-        const Admin = await User.findOne({ email: normalizedEmail, role: "admin" });
-        if (Admin) {
+        const admin = await Admin.findOne({ email: email });
+        if (admin) {
             return res.status(400).json({ error: "Admin already exists" });
         }else{
 
@@ -21,10 +19,10 @@ router.post("/register", async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create admin user
-        const newAdmin = await User.create({
+        const newAdmin = await Admin.create({
             username,
             password: hashedPassword,
-            email: normalizedEmail,
+            email,
             role: "admin", // Set role as admin
         });
 
@@ -43,7 +41,7 @@ router.post("/login", async (req, res) => {
         const normalizedEmail = email.toLowerCase();
 
         // Check if admin exists
-        const admin = await User.findOne({ email: normalizedEmail, role: "admin" }).select("+password");
+        const admin = await Admin.findOne({ email: normalizedEmail, role: "admin" }).select("+password");
         if (!admin) {
             return res.status(400).json({ error: "Admin not found" });
         }
