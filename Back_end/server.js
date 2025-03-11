@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
 import authRoutes from'./routes/loginauth.js';
-import adminauth from'./routes/adminauth.js';
 
 
 dotenv.config();
@@ -19,6 +18,8 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
   
+
+
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 // Sample route
@@ -26,5 +27,5 @@ app.get("/", (req, res) => {
   res.send("Todo Backend Running");
 });
 
-app.use("/user_auth", authRoutes);
-app.use("/admin_auth", adminauth);
+
+app.use("/auth", authRoutes);

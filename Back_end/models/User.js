@@ -14,14 +14,13 @@ const User = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        
     },
-    role: {
+    role:{
         type: String,
+        required: true,
         enum: ["user", "admin"],
-        default: "user",
-    
+        default: "user"
     }
-});
+    });
     const Usermodel = mongoose.model("User", User);
     module.exports = Usermodel;
