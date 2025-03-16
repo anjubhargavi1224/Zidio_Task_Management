@@ -1,14 +1,18 @@
-/* Task Management Layout */
+/* ==========================
+   Task Management Layout
+   ========================== */
 .task-container {
   display: flex;
   height: 100vh;
   width: 99vw;
-  background: #e6f3fc;
+  background: #e6f3fc; /* Light blue background */
   font-family: Arial, sans-serif;
   overflow: hidden;
 }
 
-/* Sidebar */
+/* ==========================
+   Sidebar
+   ========================== */
 .sidebar {
   height: 100vh;
   width: 220px;
@@ -41,18 +45,21 @@
   border-radius: 5px;
 }
 
-/* Main Content */
+/* ==========================
+   Main Content Area
+   ========================== */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   padding: 0;
   overflow-y: auto;
-  margin-top: 70px;
+  margin-top: 70px; /* Adjusted for fixed header */
 }
 
-
-/* Top Header */
+/* ==========================
+   Top Header
+   ========================== */
 .top-header {
   width: 100%;
   background: white;
@@ -65,7 +72,9 @@
   gap: 350px;
 }
 
-/* Search Bar */
+/* ==========================
+   Search Bar
+   ========================== */
 .search-box {
   display: flex;
   align-items: center;
@@ -81,7 +90,9 @@
   background: transparent;
 }
 
-/* Profile Section */
+/* ==========================
+   Profile Section
+   ========================== */
 .profile-section {
   display: flex;
 }
@@ -99,7 +110,9 @@
   margin-right: 3rem;
 }
 
-/* Task Grid */
+/* ==========================
+   Task Grid Layout
+   ========================== */
 .task-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -107,7 +120,9 @@
   padding: 20px;
 }
 
-/* Task Card */
+/* ==========================
+   Task Card
+   ========================== */
 .task-card {
   background: white;
   padding: 15px;
@@ -125,7 +140,9 @@
   border-radius: 5px;
 }
 
-/* Task Actions */
+/* ==========================
+   Task Actions
+   ========================== */
 .task-actions {
   display: flex;
   justify-content: flex-end;
@@ -152,7 +169,9 @@
   color: gray;
 }
 
-/* Add Task Button */
+/* ==========================
+   Add Task Button
+   ========================== */
 .add-task-btn {
   position: fixed;
   bottom: 20px;
@@ -168,6 +187,9 @@
   cursor: pointer;
 }
 
+/* ==========================
+   Complete Button
+   ========================== */
 .complete-btn {
   background-color: #28a745;
   color: white;
@@ -190,7 +212,9 @@
   font-size: 16px;
 }
 
-
+/* ==========================
+   Task Form Popup
+   ========================== */
 .task-form-popup {
   position: fixed;
   top: 50%;
@@ -208,91 +232,9 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
-.task-form-popup input,
-.task-form-popup textarea {
-  width: 95%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  outline: none;
-}
-
-.task-form-popup textarea {
-  resize: none;
-  height: 60px;
-}
-
-.task-form-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.task-form-buttons button {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  border-radius: 5px;
-  transition: background 0.3s;
-}
-
-.cancel-task-btn {
-  background-color: #dc3545;
-  color: white;
-  margin-right: 5px;
-}
-
-.cancel-task-btn:hover {
-  background-color: #c82333;
-}
-
-.task-form-buttons button:last-child {
-  background-color: #007bff;
-  color: white;
-}
-
-.task-form-buttons button:last-child:hover {
-  background-color: #0056b3;
-}
-
-/* Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -60%);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
-}
-
-/* Responsive */
-@media (max-width: 400px) {
-  .task-form-popup {
-    width: 90%;
-    padding: 15px;
-  }
-}
-
-
-
-/* Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -60%);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
-}
-
-/* Responsive Adjustments */
+/* ==========================
+   Responsive Design
+   ========================== */
 @media (max-width: 900px) {
   .sidebar {
     width: 180px;
@@ -311,12 +253,7 @@
 
   .sidebar {
     width: 100%;
-    box-shadow: none;
     text-align: center;
-  }
-
-  .top-header {
-    width: 100%;
   }
 
   .task-grid {
@@ -327,5 +264,19 @@
 @media (max-width: 480px) {
   .task-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+/* ==========================
+   Fade-in Animation
+   ========================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
   }
 }
