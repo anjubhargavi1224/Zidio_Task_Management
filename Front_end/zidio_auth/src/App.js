@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import AuthForm from "./components/AuthForm";
+import TaskManagement from "./components/TaskManagement";
 import AdminPanel from "./pages/AdminPanel";
-import TaskManager from "./components/TaskManager";
 
 // Function to check user role
 const isAdmin = () => {
@@ -28,7 +28,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<AuthForm />} />
-        <Route path="/tasks" element={< TaskManager />}  />
+        <Route path="/tasks" element={<TaskManagement />} />
         <Route path="/admin" element={<ProtectedRoute element={<AdminPanel />} />} />
       </Routes>
     </Router>
