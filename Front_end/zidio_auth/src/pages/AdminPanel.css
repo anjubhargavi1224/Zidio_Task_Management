@@ -1,108 +1,294 @@
+/* Admin Panel Layout */
 .admin-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw; /* Ensure full width */
-    background: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    overflow: hidden; /* Prevent scrolling */
+  display: flex;
+  height: 100vh;
+  width: 100vw; /* Ensure full width */
+  background: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevent scrolling */
 }
 
+/* Sidebar Styling */
 .admin-sidebar {
-    width: 250px;
-    background: #333;
-    color: white;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    height: 100vh; /* Full height */
+  width: 250px;
+  background: #333;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100vh; /* Full height */
 }
 
+/* Sidebar List Styling */
 .admin-sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
+/* Sidebar List Items */
 .admin-sidebar li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  cursor: pointer;
 }
 
+/* Logout Button Styling */
 .admin-sidebar .logout {
-    margin-top: auto;
-    color: red;
+  margin-top: auto;
+  color: red;
 }
 
+/* Main Content Area */
 .admin-content {
-    flex: 1;
-    padding: 20px;
-    height: 100vh;
-    overflow-y: auto; /* Enables scrolling if content overflows */
+  flex: 1;
+  padding: 20px;
+  height: 100vh;
+  overflow-y: auto; /* Enables scrolling if content overflows */
 }
 
+/* Header Section */
 .admin-header {
-    background: white;
-    padding: 20px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  background: white;
+  padding: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .admin-header h1 {
-    margin: 0;
+  margin: 0;
 }
 
+/* Statistics Section */
 .admin-stats {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
 }
 
 .stat-box {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-    flex: 1; /* Make stat boxes equal width */
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  flex: 1; /* Make stat boxes equal width */
 }
 
+/* User Table */
 .admin-users {
-    margin-top: 30px;
+  margin-top: 30px;
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
 }
 
 th, td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
 }
 
+/* Table Header Styling */
 th {
-    background: #333;
-    color: white;
+  background: #333;
+  color: white;
 }
 
+/* Button Styling */
 button {
-    margin-right: 5px;
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    background: #007bff;
-    color: white;
-    border-radius: 4px;
+  margin-right: 5px;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  border-radius: 4px;
 }
 
 button:hover {
-    background: #0056b3;
+  background: #0056b3;
+}
+
+/* Task Grid Layout */
+.TASK_GRID {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  padding: 20px;
+}
+
+/* Task Card Styling */
+.TASK_CARD {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Task Input Fields */
+.TASK_CARD input,
+.TASK_CARD textarea,
+.TASK_CARD input[type="datetime-local"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Task Action Buttons */
+.TASK_ACTIONS {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.EDIT_ICON,
+.DELETE_ICON,
+.SAVE_ICON,
+.CANCEL_ICON {
+  cursor: pointer;
+  padding: 5px;
+}
+
+/* Delete Icon Styling */
+.DELETE_ICON {
+  color: rgb(249, 81, 81);
+}
+
+/* Save Icon Styling */
+.SAVE_ICON {
+  color: green;
+}
+
+/* Cancel Icon Styling */
+.CANCEL_ICON {
+  color: gray;
+}
+
+/* Add Task Floating Button */
+.ADD_TASK_BTN {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  border: none;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  cursor: pointer;
+}
+
+/* Complete Task Button */
+.COMPLETE_BTN {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.COMPLETE_BTN:hover {
+  background-color: #218838;
+}
+
+.COMPLETE_ICON {
+  font-size: 16px;
+}
+
+/* Task Form Popup */
+.TASK_FORM_POPUP {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 350px;
+  background: white;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Task Form Inputs */
+.TASK_FORM_POPUP input,
+.TASK_FORM_POPUP textarea {
+  width: 95%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+}
+
+/* Task Form Buttons */
+.TASK_FORM_BUTTONS {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.TASK_FORM_BUTTONS button {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+/* Cancel Button Styling */
+.CANCEL_TASK_BTN {
+  background-color: #dc3545;
+  color: white;
+  margin-right: 5px;
+}
+
+.CANCEL_TASK_BTN:hover {
+  background-color: #c82333;
+}
+
+/* Submit Button Styling */
+.TASK_FORM_BUTTONS button:last-child {
+  background-color: #007bff;
+  color: white;
+}
+
+.TASK_FORM_BUTTONS button:last-child:hover {
+  background-color: #0056b3;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+      transform: translate(-50%, -60%);
+  }
+  to {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+  }
 }
