@@ -1,18 +1,14 @@
-/* ==========================
-   Task Management Layout
-   ========================== */
+/* Task Management Layout */
 .task-container {
   display: flex;
   height: 100vh;
   width: 99vw;
-  background: #e6f3fc; /* Light blue background */
+  background: #e6f3fc;
   font-family: Arial, sans-serif;
   overflow: hidden;
 }
 
-/* ==========================
-   Sidebar
-   ========================== */
+/* Sidebar */
 .sidebar {
   height: 100vh;
   width: 220px;
@@ -45,21 +41,18 @@
   border-radius: 5px;
 }
 
-/* ==========================
-   Main Content Area
-   ========================== */
+/* Main Content */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   padding: 0;
   overflow-y: auto;
-  margin-top: 70px; /* Adjusted for fixed header */
+  margin-top: 70px;
 }
 
-/* ==========================
-   Top Header
-   ========================== */
+
+/* Top Header */
 .top-header {
   width: 100%;
   background: white;
@@ -72,9 +65,7 @@
   gap: 350px;
 }
 
-/* ==========================
-   Search Bar
-   ========================== */
+/* Search Bar */
 .search-box {
   display: flex;
   align-items: center;
@@ -90,9 +81,7 @@
   background: transparent;
 }
 
-/* ==========================
-   Profile Section
-   ========================== */
+/* Profile Section */
 .profile-section {
   display: flex;
 }
@@ -107,12 +96,10 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  margin-right: 3rem;
+
 }
 
-/* ==========================
-   Task Grid Layout
-   ========================== */
+/* Task Grid */
 .task-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -120,9 +107,7 @@
   padding: 20px;
 }
 
-/* ==========================
-   Task Card
-   ========================== */
+/* Task Card */
 .task-card {
   background: white;
   padding: 15px;
@@ -140,9 +125,7 @@
   border-radius: 5px;
 }
 
-/* ==========================
-   Task Actions
-   ========================== */
+/* Task Actions */
 .task-actions {
   display: flex;
   justify-content: flex-end;
@@ -169,27 +152,23 @@
   color: gray;
 }
 
-/* ==========================
-   Add Task Button
-   ========================== */
+/* Add Task Button */
 .add-task-btn {
   position: fixed;
   bottom: 20px;
   right: 20px;
   border: none;
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 50px;
   cursor: pointer;
+  
 }
 
-/* ==========================
-   Complete Button
-   ========================== */
 .complete-btn {
   background-color: #28a745;
   color: white;
@@ -212,9 +191,7 @@
   font-size: 16px;
 }
 
-/* ==========================
-   Task Form Popup
-   ========================== */
+
 .task-form-popup {
   position: fixed;
   top: 50%;
@@ -232,9 +209,91 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* ==========================
-   Responsive Design
-   ========================== */
+.task-form-popup input,
+.task-form-popup textarea {
+  width: 95%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+}
+
+.task-form-popup textarea {
+  resize: none;
+  height: 60px;
+}
+
+.task-form-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.task-form-buttons button {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.cancel-task-btn {
+  background-color: #dc3545;
+  color: white;
+  margin-right: 5px;
+}
+
+.cancel-task-btn:hover {
+  background-color: #c82333;
+}
+
+.task-form-buttons button:last-child {
+  background-color: #007bff;
+  color: white;
+}
+
+.task-form-buttons button:last-child:hover {
+  background-color: #0056b3;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Responsive */
+@media (max-width: 400px) {
+  .task-form-popup {
+    width: 90%;
+    padding: 15px;
+  }
+}
+
+
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Responsive Adjustments */
 @media (max-width: 900px) {
   .sidebar {
     width: 180px;
@@ -253,7 +312,12 @@
 
   .sidebar {
     width: 100%;
+    box-shadow: none;
     text-align: center;
+  }
+
+  .top-header {
+    width: 100%;
   }
 
   .task-grid {
@@ -267,16 +331,108 @@
   }
 }
 
-/* ==========================
-   Fade-in Animation
-   ========================== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -60%);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
+
+/* Profile Section Css  */
+.profile-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 150px;
+}
+
+.profile-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 16px;
+  cursor: pointer;
+  color: black;
+}
+
+.profile-option:hover {
+  background: #d0eaff;
+  border-radius: 5px;
+}
+
+.profile-option svg {
+  font-size: 18px;
+}
+
+
+.profile-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  width: 250px;
+}
+
+.profile-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+  text-align: left;
+}
+
+.profile-card {
+  text-align: center;
+  background: #eaf6ff;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.profile-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.profile-card p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.update-btn {
+  background: #007bff;
+  color: white;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.update-btn:hover {
+  background: #0056b3;
 }
