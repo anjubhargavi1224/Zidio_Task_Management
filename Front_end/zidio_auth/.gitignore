@@ -4,6 +4,8 @@
 
 /.pnp
 .pnp.js
+.cache/
+
 
 # testing
 /coverage
