@@ -1,33 +1,46 @@
 import React, { useState } from "react";
-import { FaSearch, FaEdit, FaTrash, FaPlus, FaSave, FaCheck } from "react-icons/fa";
+import md5 from "blueimp-md5"; // Import MD5 for hashing emails
+import { FaSearch, FaEdit, FaTrash, FaSave, FaCheck, FaUser, FaSignOutAlt } from "react-icons/fa";
 import "./TaskManagement.css";
 
+// Function to generate Gravatar image URL based on the hashed email
+const getGravatarURL = (email) => {
+  const hash = md5(email.trim().toLowerCase()); // Generate MD5 hash
+  return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
+};
+
 const TaskManagement = () => {
-  // State to store the list of tasks
+  // State for managing tasks
   const [tasks, setTasks] = useState([]);
+  const [activeSection, setActiveSection] = useState("all"); // Filter tasks by status
+  const [showForm, setShowForm] = useState(false); // Toggle task form visibility
+  const [showProfileOptions, setShowProfileOptions] = useState(false); // Toggle profile dropdown
+  const [showProfile, setShowProfile] = useState(false); // Toggle profile details
 
-  // State to track the active section (All, In Progress, Completed)
-  const [activeSection, setActiveSection] = useState("all");
+  // User email (Replace with dynamic email when implementing authentication)
+  const [userEmail] = useState("tejas@example.com"); 
+  const avatarURL = getGravatarURL(userEmail); // Get user Gravatar image
 
-  // State to toggle task creation form
-  const [showForm, setShowForm] = useState(false);
-
-  // State to store new task details
+  // State for handling new task input fields
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
     startDate: "",
     endDate: "",
-    status: "inProgress" // Default status
+    status: "inProgress",
   });
 
-  // State to track editing mode
-  const [editingTaskId, setEditingTaskId] = useState(null);
+  // State for editing a task
+  const [editingTaskId, setEditingTaskId] = useState(null); // Track which task is being edited
+  const [editedTask, setEditedTask] = useState({
+    title: "",
+    description: "",
+    startDate: "",
+    endDate: "",
+    status: "",
+  });
 
-  // State to store the edited task details
-  const [editedTask, setEditedTask] = useState({ title: "", description: "", startDate: "", endDate: "", status: "" });
-
-  // Handle changes in the task creation form
+  // Handle input changes for adding a new task
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setNewTask({ ...newTask, [name]: value });
@@ -36,73 +49,114 @@ const TaskManagement = () => {
   // Add a new task to the task list
   const addTask = () => {
     if (newTask.title && newTask.description && newTask.startDate && newTask.endDate) {
-      const task = { id: Date.now(), ...newTask };
+      const task = { id: Date.now(), ...newTask }; // Assign unique ID using timestamp
       setTasks([...tasks, task]);
       setNewTask({ title: "", description: "", startDate: "", endDate: "", status: "inProgress" });
-      setShowForm(false);
+      setShowForm(false); // Close the form after adding task
     }
   };
 
-  // Delete a task from the task list
+  // Delete a task based on its ID
   const deleteTask = (taskId) => {
     setTasks(tasks.filter((task) => task.id !== taskId));
   };
 
-  // Enable editing mode for a selected task
+  // Start editing a specific task
   const startEditing = (task) => {
     setEditingTaskId(task.id);
     setEditedTask({ title: task.title, description: task.description, startDate: task.startDate, endDate: task.endDate, status: task.status });
   };
 
-  // Handle changes in the edit form
+  // Handle input changes while editing a task
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditedTask({ ...editedTask, [name]: value });
   };
 
-  // Save edited task details
+  // Save the edited task details
   const saveEdit = (taskId) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, ...editedTask } : task
-      )
-    );
-    setEditingTaskId(null);
+    setTasks(tasks.map((task) => (task.id === taskId ? { ...task, ...editedTask } : task)));
+    setEditingTaskId(null); // Exit editing mode
   };
 
   // Mark a task as completed
   const completeTask = (taskId) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, status: "completed" } : task
-      )
-    );
+    setTasks(tasks.map((task) => (task.id === taskId ? { ...task, status: "completed" } : task)));
   };
 
   return (
     <div className="task-container">
-      {/* Sidebar navigation */}
+      {/* Sidebar with task filters */}
       <aside className="sidebar">
-        <button className={activeSection === "all" ? "active" : ""} onClick={() => setActiveSection("all")}>All Tasks</button>
-        <button className={activeSection === "inProgress" ? "active" : ""} onClick={() => setActiveSection("inProgress")}>In Progress</button>
-        <button className={activeSection === "completed" ? "active" : ""} onClick={() => setActiveSection("completed")}>Completed</button>
+        <button className={activeSection === "all" ? "active" : ""} onClick={() => setActiveSection("all")}>
+          All Tasks
+        </button>
+        <button className={activeSection === "inProgress" ? "active" : ""} onClick={() => setActiveSection("inProgress")}>
+          In Progress
+        </button>
+        <button className={activeSection === "completed" ? "active" : ""} onClick={() => setActiveSection("completed")}>
+          Completed
+        </button>
       </aside>
 
+      {/* Main content area */}
       <div className="main-content">
-        {/* Header section */}
         <header className="top-header">
           <h2>Task Management</h2>
+
+          {/* Search bar */}
           <div className="search-box">
             <FaSearch className="search-icon" />
             <input type="text" placeholder="Search bar" />
           </div>
+
+          {/* Profile and notification section */}
           <div className="profile-section">
             <span className="notification-icon">🔔</span>
-            <img src="profile.png" alt="Profile" className="profile-pic" />
+
+            {/* Profile image with dropdown options */}
+            <div className="profile-container">
+              <img
+                src={avatarURL} // Gravatar image
+                alt="Profile"
+                className="profile-pic"
+                onClick={() => setShowProfileOptions(!showProfileOptions)}
+              />
+              {showProfileOptions && (
+                <div className="profile-dropdown">
+                  {!showProfile ? (
+                    <>
+                      <button className="profile-option" onClick={() => setShowProfile(true)}>
+                        <FaUser /> Profile
+                      </button>
+                      <button className="profile-option">
+                        <FaSignOutAlt /> Logout
+                      </button>
+                    </>
+                  ) : (
+                    <div className="profile-card">
+                      <img src={avatarURL} alt="Profile Pic" className="profile-image" />
+                      <p>Full Name</p>
+                      <p>{userEmail}</p>
+                      <p>Occupation</p>
+                      <p>Location</p>
+                      <p>Social Links</p>
+                      <button className="update-btn">Update Profile</button>
+                      <button className="back-btn" onClick={() => setShowProfile(false)}>Back</button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
-        {/* Task creation form (popup) */}
+        {/* Add Task Button */}
+        {activeSection === "all" && (
+          <button className="add-task-btn" onClick={() => setShowForm(true)}>+ </button>
+        )}
+
+        {/* Task Form Popup */}
         {showForm && (
           <div className="task-form-popup">
             <input type="text" name="title" placeholder="Title" value={newTask.title} onChange={handleFormChange} />
@@ -116,26 +170,25 @@ const TaskManagement = () => {
           </div>
         )}
 
-        {/* Task grid displaying tasks */}
+        {/* Display Tasks */}
         <div className="task-grid">
-          {tasks.filter(task => activeSection === "all" || task.status === activeSection).map((task) => (
-            <div key={task.id} className="task-card">
-              {editingTaskId === task.id ? (
-                <>
-                  <input type="text" name="title" value={editedTask.title} onChange={handleEditChange} />
-                  <textarea name="description" value={editedTask.description} onChange={handleEditChange} />
-                  <input type="date" name="startDate" value={editedTask.startDate} onChange={handleEditChange} />
-                  <input type="date" name="endDate" value={editedTask.endDate} onChange={handleEditChange} />
-                  <div className="task-actions">
+          {tasks
+            .filter((task) => activeSection === "all" || task.status === activeSection)
+            .map((task) => (
+              <div key={task.id} className="task-card">
+                {editingTaskId === task.id ? (
+                  <>
+                    <input type="text" name="title" value={editedTask.title} onChange={handleEditChange} />
+                    <textarea name="description" value={editedTask.description} onChange={handleEditChange} />
+                    <input type="date" name="startDate" value={editedTask.startDate} onChange={handleEditChange} />
+                    <input type="date" name="endDate" value={editedTask.endDate} onChange={handleEditChange} />
                     <FaSave className="save-icon" onClick={() => saveEdit(task.id)} />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h3>Title: {task.title}</h3>
-                  <p>Description: {task.description}</p>
-                  <p className="task-date">Start: {task.startDate} | End: {task.endDate}</p>
-                  <div className="task-actions">
+                  </>
+                ) : (
+                  <>
+                    <h3>Title: {task.title}</h3>
+                    <p>Description: {task.description}</p>
+                    <p className="task-date">Start: {task.startDate} | End: {task.endDate}</p>
                     <FaEdit className="edit-icon" onClick={() => startEditing(task)} />
                     <FaTrash className="delete-icon" onClick={() => deleteTask(task.id)} />
                     {task.status !== "completed" && (
@@ -143,19 +196,11 @@ const TaskManagement = () => {
                         <FaCheck className="complete-icon" /> Complete
                       </button>
                     )}
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+                  </>
+                )}
+              </div>
+            ))}
         </div>
-
-        {/* Add Task Button */}
-        {activeSection === "all" && (
-          <button className="add-task-btn" onClick={() => setShowForm(true)}>
-            <FaPlus />
-          </button>
-        )}
       </div>
     </div>
   );
