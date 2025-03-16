@@ -3,24 +3,37 @@ import { FaSearch, FaEdit, FaTrash, FaPlus, FaSave, FaCheck } from "react-icons/
 import "./TaskManagement.css";
 
 const TaskManagement = () => {
+  // State to store the list of tasks
   const [tasks, setTasks] = useState([]);
+
+  // State to track the active section (All, In Progress, Completed)
   const [activeSection, setActiveSection] = useState("all");
+
+  // State to toggle task creation form
   const [showForm, setShowForm] = useState(false);
+
+  // State to store new task details
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
     startDate: "",
     endDate: "",
-    status: "inProgress"
+    status: "inProgress" // Default status
   });
+
+  // State to track editing mode
   const [editingTaskId, setEditingTaskId] = useState(null);
+
+  // State to store the edited task details
   const [editedTask, setEditedTask] = useState({ title: "", description: "", startDate: "", endDate: "", status: "" });
 
+  // Handle changes in the task creation form
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setNewTask({ ...newTask, [name]: value });
   };
 
+  // Add a new task to the task list
   const addTask = () => {
     if (newTask.title && newTask.description && newTask.startDate && newTask.endDate) {
       const task = { id: Date.now(), ...newTask };
@@ -30,20 +43,24 @@ const TaskManagement = () => {
     }
   };
 
+  // Delete a task from the task list
   const deleteTask = (taskId) => {
     setTasks(tasks.filter((task) => task.id !== taskId));
   };
 
+  // Enable editing mode for a selected task
   const startEditing = (task) => {
     setEditingTaskId(task.id);
     setEditedTask({ title: task.title, description: task.description, startDate: task.startDate, endDate: task.endDate, status: task.status });
   };
 
+  // Handle changes in the edit form
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditedTask({ ...editedTask, [name]: value });
   };
 
+  // Save edited task details
   const saveEdit = (taskId) => {
     setTasks(
       tasks.map((task) =>
@@ -53,6 +70,7 @@ const TaskManagement = () => {
     setEditingTaskId(null);
   };
 
+  // Mark a task as completed
   const completeTask = (taskId) => {
     setTasks(
       tasks.map((task) =>
@@ -63,6 +81,7 @@ const TaskManagement = () => {
 
   return (
     <div className="task-container">
+      {/* Sidebar navigation */}
       <aside className="sidebar">
         <button className={activeSection === "all" ? "active" : ""} onClick={() => setActiveSection("all")}>All Tasks</button>
         <button className={activeSection === "inProgress" ? "active" : ""} onClick={() => setActiveSection("inProgress")}>In Progress</button>
@@ -70,8 +89,9 @@ const TaskManagement = () => {
       </aside>
 
       <div className="main-content">
-        <hejader className="top-header">
-        <h2>Task Management</h2>
+        {/* Header section */}
+        <header className="top-header">
+          <h2>Task Management</h2>
           <div className="search-box">
             <FaSearch className="search-icon" />
             <input type="text" placeholder="Search bar" />
@@ -80,8 +100,9 @@ const TaskManagement = () => {
             <span className="notification-icon">🔔</span>
             <img src="profile.png" alt="Profile" className="profile-pic" />
           </div>
-        </hejader>
+        </header>
 
+        {/* Task creation form (popup) */}
         {showForm && (
           <div className="task-form-popup">
             <input type="text" name="title" placeholder="Title" value={newTask.title} onChange={handleFormChange} />
@@ -95,6 +116,7 @@ const TaskManagement = () => {
           </div>
         )}
 
+        {/* Task grid displaying tasks */}
         <div className="task-grid">
           {tasks.filter(task => activeSection === "all" || task.status === activeSection).map((task) => (
             <div key={task.id} className="task-card">
@@ -121,7 +143,6 @@ const TaskManagement = () => {
                         <FaCheck className="complete-icon" /> Complete
                       </button>
                     )}
-
                   </div>
                 </>
               )}
@@ -129,6 +150,7 @@ const TaskManagement = () => {
           ))}
         </div>
 
+        {/* Add Task Button */}
         {activeSection === "all" && (
           <button className="add-task-btn" onClick={() => setShowForm(true)}>
             <FaPlus />
