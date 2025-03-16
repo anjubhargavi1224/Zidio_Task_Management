@@ -70,6 +70,38 @@ router.post("/login", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+router.post("/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
+        // Find user by email and include password
+        const user = await User.findOne({ email }).select("+password");
+        if (!user) {
+            return res.status(400).json({ error: "User not found" });
+        }
+
+        // Check password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({ error: "Invalid credentials" });
+        }
+
+        // Generate JWT Token
+        const token = jwt.sign(
+            { id: user._id, email: user.email, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        res.status(200).json({
+            message: "Login successful",
+            user: { username: user.username, email: user.email, role: user.role },
+            token
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 export default router;
