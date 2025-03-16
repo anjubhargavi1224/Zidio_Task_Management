@@ -36,12 +36,11 @@ const AdminPanel = () => {
         </header>
 
         {/* Conditional Rendering Based on Selected Tab */}
-        {selectedTab === "dashboard" && (
+       
           <section className="admin-stats">
             <div className="stat-box">Total Users: {users.length}</div>
             <div className="stat-box">Total Tasks: {tasks.length}</div>
           </section>
-        )}
 
         {selectedTab === "users" && (
           <section className="admin-users">
