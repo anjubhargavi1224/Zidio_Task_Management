@@ -3,6 +3,7 @@ import md5 from "blueimp-md5"; // Import MD5 for hashing emails
 import { FaSearch, FaEdit, FaTrash, FaSave, FaCheck, FaUser, FaSignOutAlt } from "react-icons/fa";
 import "./TaskManagement.css";
 
+
 // Function to generate Gravatar image URL based on the hashed email
 const getGravatarURL = (email) => {
   const hash = md5(email.trim().toLowerCase()); // Generate MD5 hash
