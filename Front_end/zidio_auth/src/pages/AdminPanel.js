@@ -1,15 +1,28 @@
 import React, { useState } from "react";
 import { FaUsers, FaTasks, FaSignOutAlt, FaEdit, FaSave, FaTrash, FaCheck } from "react-icons/fa";
+import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import "./AdminPanel.css";
 
 const AdminPanel = () => {
   const [selectedTab, setSelectedTab] = useState("dashboard");
+  const [activeSection, setActiveSection] = useState("all"); // State for task filtering
+  const [selectedUser , setSelectedUser ] = useState(""); // State for user filtering
   const [tasks, setTasks] = useState([]); // State for task management
   const [users] = useState([
-    { id: 1, name: "John Doe" },
-    { id: 2, name: "Alice Smith" },
-    { id: 3, name: "Bob Johnson" },
+    { id: 1, name: "John Doe", email: "johndoe003@gmail.com" },
+    { id: 2, name: "Alice Smith", email: "alicesmith004@gmail.com" },
+    { id: 3, name: "Bob Johnson", email: "bobjohnson003@gmail.com" },
+    { id: 4, name: "Kim Bob", email: "bobkim005@gmail.com" },
   ]); // Sample Users
+
+  // Chart data for task overview
+  const data = [
+    { name: "Completed", value: tasks.filter(task => task.status === "completed").length },
+    { name: "Pending", value: tasks.filter(task => task.status !== "completed").length },
+  ];
+
+  // Colors for the pie chart
+  const COLORS = ['#34D399', '#EF4444'];
 
   return (
     <div className="admin-container">
@@ -23,10 +36,31 @@ const AdminPanel = () => {
           <li onClick={() => setSelectedTab("tasks")}>
             <FaTasks /> Manage Tasks
           </li>
-          <li className="logout">
-            <FaSignOutAlt /> Logout
-          </li>
         </ul>
+
+        <div className="chart-container">
+          <PieChart width={300} height={280}>
+            <Pie
+              data={data}
+              cx={150}
+              cy={200}
+              labelLine={false}
+              label={entry => entry.name}
+              outerRadius={60}
+              fill="#8884d8"
+              dataKey="value"
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </div>
+
+        <div className="logout">
+          <FaSignOutAlt /><span>Logout</span>
+        </div>
       </aside>
 
       {/* Main Content */}
@@ -36,11 +70,10 @@ const AdminPanel = () => {
         </header>
 
         {/* Conditional Rendering Based on Selected Tab */}
-       
-          <section className="admin-stats">
-            <div className="stat-box">Total Users: {users.length}</div>
-            <div className="stat-box">Total Tasks: {tasks.length}</div>
-          </section>
+        <section className="admin-stats">
+          <div className="stat-box">Total Users: {users.length}</div>
+          <div className="stat-box">Total Tasks: {tasks.length}</div>
+        </section>
 
         {selectedTab === "users" && (
           <section className="admin-users">
@@ -50,6 +83,7 @@ const AdminPanel = () => {
                 <tr>
                   <th>ID</th>
                   <th>Name</th>
+                  <th>Email</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -58,6 +92,7 @@ const AdminPanel = () => {
                   <tr key={user.id}>
                     <td>{user.id}</td>
                     <td>{user.name}</td>
+                    <td>{user.email}</td>
                     <td>
                       <button>Edit</button>
                       <button>Delete</button>
@@ -69,14 +104,24 @@ const AdminPanel = () => {
           </section>
         )}
 
-        {selectedTab === "tasks" && <AllTasks tasks={tasks} setTasks={setTasks} users={users} />}
+        {selectedTab === "tasks" && (
+          <AllTasks 
+            tasks={tasks} 
+            setTasks={setTasks} 
+            users={users} 
+            activeSection={activeSection} 
+            setActiveSection={setActiveSection} 
+            selectedUser ={selectedUser } 
+            setSelectedUser ={setSelectedUser } 
+          />
+        )}
       </div>
     </div>
   );
 };
 
 // ---------------------- AllTasks Component ----------------------
-const AllTasks = ({ tasks, setTasks, users }) => {
+const AllTasks = ({ tasks, setTasks, users, activeSection, setActiveSection, selectedUser , setSelectedUser  }) => {
   const [showForm, setShowForm] = useState(false);
   const [newTask, setNewTask] = useState({
     title: "",
@@ -150,6 +195,46 @@ const AllTasks = ({ tasks, setTasks, users }) => {
   return (
     <div className="MAIN_CONTENT">
       <p>Here you can manage tasks...</p>
+
+      {/* Task Filters */}
+      <div className="task-filters-admin">
+
+          {/* User Selection Dropdown */}
+      <label htmlFor="userFilter">Filter by User:</label>
+      <select
+        id="userFilter"
+        value={selectedUser }
+        onChange={(e) => setSelectedUser (e.target.value)}
+      >
+        <option value="">All Users</option>
+        {users.map((user) => (
+          <option key={user.id} value={user.name}>
+            {user.name}
+          </option>
+        ))}
+      </select>
+
+      
+        <button
+          className={activeSection === "all" ? "active" : ""}
+          onClick={() => setActiveSection("all")}
+        id="all-task">
+          All Tasks
+        </button>
+        <button
+          className={activeSection === "inProgress" ? "active" : ""}
+          onClick={() => setActiveSection("inProgress")}
+        id="in-progress">
+          In Progress
+        </button>
+        <button
+          className={activeSection === "completed" ? "active" : ""}
+          onClick={() => setActiveSection("completed")}
+        id="completed">
+          Completed
+        </button>
+      </div>
+
       <button className="ADD_TASK_BTN" onClick={() => setShowForm(true)}>+</button>
 
       {showForm && (
@@ -188,41 +273,45 @@ const AllTasks = ({ tasks, setTasks, users }) => {
       )}
 
       <div className="TASK_GRID">
-        {tasks.map((task) => (
-          <div key={task.id} className="TASK_CARD">
-            {editingTaskId === task.id ? (
-              <>
-                <input type="text" name="title" value={editedTask.title} onChange={handleEditChange} />
-                <textarea name="description" value={editedTask.description} onChange={handleEditChange} />
-                <input type="date" name="startDate" value={editedTask.startDate} onChange={handleEditChange} />
-                <input type="date" name="endDate" value={editedTask.endDate} onChange={handleEditChange} />
-                <div className="TASK_ACTIONS">
-                  <FaSave className="SAVE_ICON" onClick={() => saveEdit(task.id)} />
-                  <button className="CANCEL_EDIT_BTN" onClick={() => setEditingTaskId(null)}>Cancel Edit</button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h3>Title: {task.title}</h3>
-                <p>Description: {task.description}</p>
-                <p>Assigned To: {task.assignedTo}</p>
-                <p className="TASK_DATE">Start: {task.startDate} | End: {task.endDate}</p>
-                <div className="TASK_ACTIONS">
-                  <FaEdit className="EDIT_ICON" onClick={() => startEditing(task)} />
-                  <FaTrash className="DELETE_ICON" onClick={() => deleteTask(task.id)} />
-                  {task.status !== "completed" && (
-                    <button className="COMPLETE_BTN" onClick={() => completeTask(task.id)}>
-                      <FaCheck className="COMPLETE_ICON" /> Complete
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        ))}
+        {tasks
+          .filter(task => 
+            (activeSection === "all" || task.status === activeSection) && 
+            (selectedUser  === "" || task.assignedTo === selectedUser ) // Filter tasks based on active section and selected user
+          )
+          .map((task) => (
+            <div key={task.id} className="TASK_CARD">
+              {editingTaskId === task.id ? (
+                <>
+                  <input type="text" name="title" value={editedTask.title} onChange={handleEditChange} />
+                  <textarea name="description" value={editedTask.description} onChange={handleEditChange} />
+                  <input type="date" name="startDate" value={editedTask.startDate} onChange={handleEditChange} />
+                  <input type="date" name="endDate" value={editedTask.endDate} onChange={handleEditChange} />
+                  <div className="TASK_ACTIONS">
+                    <FaSave className="SAVE_ICON" onClick={() => saveEdit(task.id)} />
+                    <button className="CANCEL_EDIT_BTN" onClick={() => setEditingTaskId(null)}>Cancel Edit</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h3>Title: {task.title}</h3>
+                  <p>Description: {task.description}</p>
+                  <p>Assigned To: {task.assignedTo}</p>
+                  <p className="TASK_DATE">Start: {task.startDate} | End: {task.endDate}</p>
+                  <div className="TASK_ACTIONS">
+                    <FaEdit className="EDIT_ICON" onClick={() => startEditing(task)} />
+                    <FaTrash className="DELETE_ICON" onClick={() => deleteTask(task.id)} />
+                    {task.status !== "completed" && (
+                      <button className="COMPLETE_BTN" onClick={() => completeTask(task.id)}>
+                        <FaCheck className="COMPLETE_ICON" /> Complete
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
       </div>
-</div>
-
+    </div>
   );
 };
 

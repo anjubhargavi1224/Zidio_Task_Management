@@ -40,6 +40,16 @@
   background: #82c5f1;
   border-radius: 5px;
 }
+.chart-container {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  margin-bottom: 20px; /* Equivalent to mb-6 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 
 /* Main Content */
 .main-content {
@@ -62,7 +72,7 @@
   position: fixed;
   top: 0;
   z-index: 1000;
-  gap: 350px;
+  gap: 220px;
 }
 
 /* Search Bar */
@@ -77,13 +87,13 @@
 .search-box input {
   border: none;
   outline: none;
-  margin-left: 5px;
   background: transparent;
 }
 
 /* Profile Section */
 .profile-section {
   display: flex;
+  margin-left: 10px;
 }
 
 .notification-icon {
@@ -94,6 +104,7 @@
 .profile-pic {
   width: 40px;
   height: 40px;
+  margin-right: 6px;
   border-radius: 50%;
   object-fit: cover;
 
@@ -118,7 +129,7 @@
 .task-card input,
 .task-card textarea,
 .task-card input[type="datetime-local"] {
-  width: 100%;
+  width: 95%;
   padding: 8px;
   margin-bottom: 8px;
   border: 1px solid #ccc;
@@ -138,6 +149,7 @@
 .cancel-icon {
   cursor: pointer;
   padding: 5px;
+  padding-right: 5px;
 }
 
 .delete-icon {
@@ -436,3 +448,4 @@
 .update-btn:hover {
   background: #0056b3;
 }
+

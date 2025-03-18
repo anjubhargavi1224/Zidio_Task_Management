@@ -37,10 +37,21 @@
   cursor: pointer;
 }
 
+ /*Pie-chart*/
+ .chart-container {
+  margin-left: auto;
+  margin-right: 80px;
+  margin-top: 20px;
+  margin-bottom: 20px; /* Equivalent to mb-6 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Logout Button Styling */
-.admin-sidebar .logout {
-  margin-top: auto;
-  color: red;
+.logout{
+  color: #c82333;
+  margin-bottom: 120px;
 }
 
 /* Main Content Area */
@@ -138,7 +149,7 @@ button:hover {
 .TASK_CARD input,
 .TASK_CARD textarea,
 .TASK_CARD input[type="datetime-local"] {
-  width: 100%;
+  width: 95%;
   padding: 8px;
   margin-bottom: 8px;
   border: 1px solid #ccc;
@@ -292,3 +303,106 @@ button:hover {
       transform: translate(-50%, -50%);
   }
 }
+
+
+.task-filters {
+  width: 160px; /* Equivalent to w-40 */
+  padding: 16px;
+  margin-top: 80px; /* Equivalent to mt-20 */
+  background-color: #1f2937; /* bg-gray-800 */
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.filter-title {
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 600; /* font-semibold */
+  margin-bottom: 16px; /* mb-4 */
+}
+
+.filter-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* space-y-4 */
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* space-x-2 */
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Individual button colors */
+.all {
+  background-color: #3b82f6; /* bg-blue-500 */
+}
+
+.completed {
+  background-color: #10b981; /* bg-green-500 */
+}
+
+.pending {
+  background-color: #ef4444; /* bg-red-500 */
+}
+
+/* Hover effects */
+.all:hover {
+  background-color: #2563eb; /* hover:bg-blue-600 */
+}
+
+.completed:hover {
+  background-color: #059669; /* hover:bg-green-600 */
+}
+
+.pending:hover {
+  background-color: #dc2626; /* hover:bg-red-600 */
+}
+
+/* Active state */
+.active {
+  filter: brightness(90%);
+}
+
+  /*Tak Filters*/
+  .task-filters-admin {
+    margin: 10px 0; /* Add some margin for spacing */
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+  }
+
+  
+  .task-filters button {
+    margin-right: 10px; /* Space between buttons */
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .task-filters button.active {
+    background-color: #34D399; /* Highlight active button */
+    color: white;
+  }
+  #all-task{
+    background-color: #007bff;
+  }
+  #in-progress{
+    background-color: #c82333;
+  }
+  #completed{
+    background-color: #28a745;
+  }
+  #userFilter{
+    background-color: #D3D3D3;
+  }
+
