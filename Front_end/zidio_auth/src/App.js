@@ -6,10 +6,9 @@ import AdminPanel from "./pages/AdminPanel";
 
 // Function to check user role
 const isAdmin = () => {
-  const token = localStorage.getItem("token");
   const role = localStorage.getItem("userRole");
   // return role === "admin" || role === "engineer";  // Only specific roles can access admin panel
-  if (!token) return false;
+    
   //disable the code for only specific roles to access, currently its in developer mode
   // Bypass for developers in local development
 if (process.env.NODE_ENV === "development") {

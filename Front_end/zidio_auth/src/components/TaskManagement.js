@@ -10,7 +10,7 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 import "./TaskManagement.css";
-import { RadialBarChart, RadialBar, Legend, Tooltip } from "recharts";
+import { RadialBarChart, RadialBar, Tooltip } from "recharts";
 
 
 

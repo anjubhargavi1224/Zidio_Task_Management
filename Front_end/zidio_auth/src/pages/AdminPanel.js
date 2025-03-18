@@ -39,11 +39,11 @@ const AdminPanel = () => {
         </ul>
 
         <div className="chart-container">
-          <PieChart width={300} height={280}>
+          <PieChart width={345} height={170}>
             <Pie
               data={data}
               cx={150}
-              cy={200}
+              cy={150}
               labelLine={false}
               label={entry => entry.name}
               outerRadius={60}
@@ -54,7 +54,6 @@ const AdminPanel = () => {
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip />
           </PieChart>
         </div>
 

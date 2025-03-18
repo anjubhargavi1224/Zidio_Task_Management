@@ -39,8 +39,8 @@
 
  /*Pie-chart*/
  .chart-container {
-  margin-left: auto;
-  margin-right: 80px;
+  margin-left: 20px;
+  margin-right: 30px;
   margin-top: 20px;
   margin-bottom: 20px; /* Equivalent to mb-6 */
   display: flex;
@@ -51,7 +51,7 @@
 /* Logout Button Styling */
 .logout{
   color: #c82333;
-  margin-bottom: 120px;
+  margin-top: 110px;
 }
 
 /* Main Content Area */
