@@ -34,13 +34,29 @@ const AuthForm = () => {
     }
   }, [password]);
 
-  // Handles form submission for Sign In/Sign Up
+
+  // Email validation function
+  const validateEmail = (email) => {
+    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.toLowerCase());
+  };
+  
+
+  // Password validation function
+  const validatePassword = (password) => {
+    return /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/.test(password);
+  };
+
+  // Handles form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate email field
-    if (!email.trim()) {
-      alert("Email is required!");
+    if (!validateEmail(email)) {
+      alert("Please enter a valid email address!");
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      alert("Password must be at least 6 characters long and include an uppercase letter, a number, and a special character.");
       return;
     }
 
