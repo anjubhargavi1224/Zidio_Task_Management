@@ -6,18 +6,16 @@ import AdminPanel from "./pages/AdminPanel";
 
 // Function to check user role
 const isAdmin = () => {
-  const role = localStorage.getItem("userRole");
-  // return role === "admin" || role === "engineer";  // Only specific roles can access admin panel
-    
-  //disable the code for only specific roles to access, currently its in developer mode
-  // Bypass for developers in local development
-if (process.env.NODE_ENV === "development") {
-  return true;
-}
+  const token = localStorage.getItem("token");
+  if (!token) return false; // No token means not logged in
 
-return role === "admin" || role === "engineer";
+  try {
+    const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode JWT
+    return decodedToken.role === "admin" || decodedToken.role === "user";
+  } catch (error) {
+    return false;
+  }
 };
-
 // Protected Route Component
 const ProtectedRoute = ({ element }) => {
   return isAdmin() ? element : <Navigate to="/" />; // Redirect unauthorized users
