@@ -47,39 +47,48 @@ const AuthForm = () => {
   };
 
   // Handles form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!validateEmail(email)) {
       alert("Please enter a valid email address!");
       return;
     }
-
+  
     if (!validatePassword(password)) {
-      alert("Password must be at least 6 characters long and include an uppercase letter, a number, and a special character.");
+      alert("Password must include an uppercase letter, a number, and a special character.");
       return;
     }
-
-    // Set the appropriate popup message
-    setPopupMessage(isSignUp ? "✅ Account Created Successfully!" : "🚀 Welcome back! Let’s continue.");
-    
-    // Show the popup notification
-    setShowPopup(true);
-
-    // Log the submitted credentials to the console
-    console.log(isSignUp ? "Signing Up..." : "Loggin...");
-    console.log({ name, email, password, role});
-
-    // Redirect to Task Management Page after 1 seconds
-    setTimeout(() => {
-      setShowPopup(false);
-      if(role === "admin"){
-        navigate("/admin");
-      }else{
-        navigate("/tasks"); // ✅ Redirect after successful authentication
+  
+    const endpoint = isSignUp ? "/auth/register" : "/auth/login";
+  
+    try {
+      const response = await fetch(`http://localhost:5000${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: name, email, password, role }),
+      });
+  
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userRole", data.user.role);
+        setPopupMessage(isSignUp ? "✅ Account Created Successfully!" : "🚀 Welcome back!");
+        setShowPopup(true);
+  
+        setTimeout(() => {
+          setShowPopup(false);
+          navigate(data.user.role === "admin" ? "/admin" : "/tasks");
+        }, 1000);
+      } else {
+        alert(data.error);
       }
-    }, 1000);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Something went wrong. Please try again.");
+    }
   };
+  
 
   return (
     <div className="auth-container">
@@ -145,13 +154,13 @@ const AuthForm = () => {
           </div>
 
           {/* Role Selection Dropdown */}
-            <div className="input-group">
+            {/* <div className="input-group">
               <label className="role-label">{isSignUp ? " Register as:" : "Login as:"}</label>
               <select value={role} onChange={(e) => setRole(e.target.value)}>
                 <option value="user">User</option>
                 <option value="admin">Admin</option>
               </select>
-            </div>
+            </div> */}
 
 
           {/* Forgot Password Link (Only for Sign In Mode) */}

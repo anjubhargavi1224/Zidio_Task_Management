@@ -70,5 +70,12 @@ router.post("/login", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
+router.post("/logout", (req, res) => {
+    try {
+        // Clear the token from client side
+        res.status(200).json({ message: "Logged out successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Logout failed" });
+    }
+});
 export default router;

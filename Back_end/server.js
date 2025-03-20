@@ -28,14 +28,6 @@ app.get("/", (req, res) => {
 // Authentication Routes
 app.use("/auth", authRoutes);
 
-// Protected Route (Accessible only with valid JWT)
-app.get("/dashboard", verifyToken, (req, res) => {
-    res.json({ message: "Welcome to the dashboard!", user: req.user });
-});
 
-// Admin-Only Route
-app.get("/admin", verifyToken, authorizeRoles("admin"), (req, res) => {
-    res.json({ message: "Welcome Admin!", user: req.user });
-});
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -11,7 +11,8 @@ import {
 } from "react-icons/fa";
 import "./TaskManagement.css";
 import { RadialBarChart, RadialBar, Tooltip } from "recharts";
-
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom"; 
 
 
 // Function to generate Gravatar image URL based on the hashed email
@@ -128,6 +129,27 @@ const TaskManagement = () => {
     );
   };
 
+  // Logout function (Replace with actual logout functionality)
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove stored JWT token
+    localStorage.removeItem("userRole"); // Remove role if stored
+  
+    // Redirect to login page and clear history to prevent going back
+    window.location.replace("/"); 
+  };
+  
+
+  const navigate = useNavigate(); // React Router navigation
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/"); // Redirect to login if not authenticated
+    }
+  }, [navigate]); // Run on component mount
+  
+  
+
   return (
     <div className="task-container">
       {/* Sidebar with task filters */}
@@ -202,7 +224,7 @@ const TaskManagement = () => {
                       >
                         <FaUser /> Profile
                       </button>
-                      <button className="profile-option">
+                      <button className="profile-option" onClick={handleLogout}>
                         <FaSignOutAlt /> Logout
                       </button>
                     </>
