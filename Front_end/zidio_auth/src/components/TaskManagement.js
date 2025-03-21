@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import md5 from "blueimp-md5"; // Import MD5 for hashing emails
 import {
   FaSearch,
@@ -6,15 +6,13 @@ import {
   FaTrash,
   FaSave,
   FaCheck,
-  FaUser,
+  FaUser ,
   FaSignOutAlt,
 } from "react-icons/fa";
 import "./TaskManagement.css";
 import { RadialBarChart, RadialBar, Tooltip } from "recharts";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 import UpdateProfile from './UpdateProfile'; // Import the UpdateProfile component
-
 
 // Function to generate Gravatar image URL based on the hashed email
 const getGravatarURL = (email) => {
@@ -74,6 +72,14 @@ const TaskManagement = () => {
   // State for search query
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Load notifications from localStorage
+  useEffect(() => {
+    const userId = userDetails.email; // Assuming user ID is based on email for simplicity
+    const savedNotifications = JSON.parse(localStorage.getItem(`notifications_${userId}`)) || [];
+    setNotifications(savedNotifications);
+    setNewNotifications(savedNotifications.length);
+  }, [userDetails.email]);
+
   // Handle input changes for adding a new task
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -100,6 +106,9 @@ const TaskManagement = () => {
         status: "inProgress",
       });
       setShowForm(false);
+
+      // Notify the user about the new task
+      addNotification(`A new task "${newTask.title}" has been assigned to you.`);
     }
   };
 
@@ -158,14 +167,20 @@ const TaskManagement = () => {
   };
 
   const clearNotifications = () => {
-    setNewNotifications(0);
+    const userId = userDetails.email; // Assuming user ID is based on email for simplicity
+    localStorage.removeItem(`notifications_${userId}`);
     setNotifications([]);
+    setNewNotifications(0);
     setShowNotifications(false);
   };
 
   const addNotification = (message) => {
-    setNotifications((prev) => [...prev, message]);
-    setNewNotifications((prev) => prev + 1);
+    const userId = userDetails.email; // Assuming user ID is based on email for simplicity
+    const userNotifications = JSON.parse(localStorage.getItem(`notifications_${userId}`)) || [];
+    userNotifications.push(message);
+    localStorage.setItem(`notifications_${userId}`, JSON.stringify(userNotifications));
+    setNotifications(userNotifications);
+    setNewNotifications(userNotifications.length);
   };
 
   // Calculate completed and pending counts
@@ -178,26 +193,23 @@ const TaskManagement = () => {
     localStorage.setItem("userDetails", JSON.stringify(updatedDetails));
   };
 
-    // Logout function (Replace with actual logout functionality)
-    const handleLogout = () => {
-      localStorage.removeItem("token"); // Remove stored JWT token
-      localStorage.removeItem("userRole"); // Remove role if stored
-    
-      // Redirect to login page and clear history to prevent going back
-      window.location.replace("/"); 
-    };
-    
-  
-    const navigate = useNavigate(); // React Router navigation
-  
-    useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/"); // Redirect to login if not authenticated
-      }
-    }, [navigate]); // Run on component mount
-    
-    
+  // Logout function (Replace with actual logout functionality)
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove stored JWT token
+    localStorage.removeItem("userRole"); // Remove role if stored
+
+    // Redirect to login page and clear history to prevent going back
+    window.location.replace("/"); 
+  };
+
+  const navigate = useNavigate(); // React Router navigation
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/"); // Redirect to login if not authenticated
+    }
+  }, [navigate]); // Run on component mount
 
   return (
     <div className="task-container">
@@ -207,7 +219,7 @@ const TaskManagement = () => {
           <h3>Hello,</h3>
           <h3>Welcome</h3>
         </div>
-        <div className="User  -details">
+        <div className="User -details">
           <p>Manage All Your Task In One Place</p>
         </div>
         <button

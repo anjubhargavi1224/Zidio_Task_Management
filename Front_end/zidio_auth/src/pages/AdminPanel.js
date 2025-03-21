@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaUsers, FaTasks, FaSignOutAlt, FaEdit, FaSave, FaTrash, FaCheck, FaPlus } from "react-icons/fa";
 import { BarChart, Bar, XAxis, Tooltip, Legend } from "recharts";
-import CreateUser from "../components/CreateUser";// Import the CreateUser  component
+import CreateUser  from "../components/CreateUser "; // Import the CreateUser  component
 import "./AdminPanel.css";
 
 const AdminPanel = () => {
@@ -13,8 +13,8 @@ const AdminPanel = () => {
   const [chartData, setChartData] = useState([]);
   const [showCreateUser , setShowCreateUser ] = useState(false); // State to control Create User form visibility
 
-   // Load users and tasks from localStorage on component mount
-   useEffect(() => {
+  // Load users and tasks from localStorage on component mount
+  useEffect(() => {
     const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
     const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
     setUsers(storedUsers);
@@ -23,7 +23,7 @@ const AdminPanel = () => {
 
   // Effect to update chart data whenever tasks, activeSection, or selectedUser  changes
   useEffect(() => {
-    const filteredTasks = tasks.filter(task => 
+    const filteredTasks = tasks.filter(task =>
       (activeSection === "all" || task.status === activeSection) &&
       (selectedUser  === "" || task.assignedTo === selectedUser )
     );
@@ -62,8 +62,15 @@ const AdminPanel = () => {
     const updatedTasks = [...tasks, taskWithId];
     setTasks(updatedTasks);
     localStorage.setItem("tasks", JSON.stringify(updatedTasks)); // Save to localStorage
-  };
 
+    // Notify the assigned user
+    const assignedUser  = users.find(user => user.name === newTask.assignedTo);
+    if (assignedUser ) {
+      const userNotifications = JSON.parse(localStorage.getItem(`notifications_${assignedUser .id}`)) || [];
+      userNotifications.push(`A new task "${newTask.title}" has been assigned to you.`);
+      localStorage.setItem(`notifications_${assignedUser .id}`, JSON.stringify(userNotifications));
+    }
+  };
 
   return (
     <div className="admin-container">
@@ -140,14 +147,14 @@ const AdminPanel = () => {
         )}
 
         {selectedTab === "tasks" && (
-          <AllTasks 
-            tasks={tasks} 
-            setTasks={setTasks} 
-            users={users} 
-            activeSection={activeSection} 
-            setActiveSection={setActiveSection} 
-            selectedUser ={selectedUser } 
-            setSelectedUser ={setSelectedUser } 
+          <AllTasks
+            tasks={tasks}
+            setTasks={setTasks}
+            users={users}
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+            selectedUser ={selectedUser }
+            setSelectedUser ={setSelectedUser }
             addTask={addTask} // Pass addTask function to AllTasks
           />
         )}
@@ -310,8 +317,8 @@ const AllTasks = ({ tasks, setTasks, users, activeSection, setActiveSection, sel
 
       <div className="TASK_GRID">
         {tasks
-          .filter(task => 
-            (activeSection === "all" || task.status === activeSection) && 
+          .filter(task =>
+            (activeSection === "all" || task.status === activeSection) &&
             (selectedUser  === "" || task.assignedTo === selectedUser ) // Filter tasks based on active section and selected user
           )
           .map((task) => (
