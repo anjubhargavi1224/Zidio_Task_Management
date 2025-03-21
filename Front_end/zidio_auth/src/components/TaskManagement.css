@@ -13,7 +13,7 @@
   height: 100vh;
   width: 220px;
   background: white;
-  padding: 20px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -40,14 +40,61 @@
   background: #82c5f1;
   border-radius: 5px;
 }
+
+.user-greeting {
+  display: flex;
+  text-align: center;
+  gap: 5px;
+}
+
+.user-greeting h3 {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.user-details {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+/*RadialBar stylings*/
 .chart-container {
   margin-left: auto;
   margin-right: auto;
-  margin-top: 20px;
-  margin-bottom: 20px; /* Equivalent to mb-6 */
+  margin-top: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+}
+.task-summary {
+  display: flex;
+  justify-content: space-between;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.summary-label {
+  font-weight: bold;
+}
+.summary-label-pen{
+  color: #c82333;
+}
+.summary-label-com{
+  color: #28a745;
+}
+
+.summary-value-pen {
+  font-size: 1.2em;
+  color: red; /* Darker color for the value */
+}
+.summary-value-com {
+  font-size: 1.2em;
+  color: #28a745; /* Darker color for the value */
 }
 
 
@@ -72,7 +119,7 @@
   position: fixed;
   top: 0;
   z-index: 1000;
-  gap: 220px;
+  gap: 230px;
 }
 
 /* Search Bar */
@@ -118,7 +165,65 @@
   padding: 20px;
 }
 
-/* Task Card */
+/* Task Grid Layout */
+.TASK_GRID {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  padding: 20px;
+}
+
+/* Task Card Styling */
+.TASK_CARD {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Task Input Fields */
+.TASK_CARD input,
+.TASK_CARD textarea,
+.TASK_CARD input[type="datetime-local"] {
+  width: 95%;
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Task Action Buttons */
+.TASK_ACTIONS {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.EDIT_ICON,
+.DELETE_ICON,
+.SAVE_ICON,
+.CANCEL_ICON {
+  cursor: pointer;
+  padding: 5px;
+}
+
+/* Delete Icon Styling */
+.DELETE_ICON {
+  color: rgb(249, 81, 81);
+}
+
+/* Save Icon Styling */
+.SAVE_ICON {
+  color: green;
+}
+
+/* Cancel Icon Styling */
+.CANCEL_ICON {
+  color: gray;
+}
+
+
+/* Task Card original */
 .task-card {
   background: white;
   padding: 15px;
@@ -435,7 +540,8 @@
   font-size: 14px;
 }
 
-.update-btn {
+.update-btn 
+.back-btn {
   background: #007bff;
   color: white;
   padding: 8px;
@@ -449,3 +555,87 @@
   background: #0056b3;
 }
 
+/* Notification Bell Icon */
+.notification-container {
+  position: relative;
+  display: inline-block;
+}
+
+.notification-icon {
+  font-size: 22px;
+  cursor: pointer;
+  position: relative;
+  padding: 10px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.notification-icon:hover {
+  transform: scale(1.1);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -3px;
+  right: -2px;
+  background-color: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Notification Dropdown */
+.notification-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 450px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.notification-item {
+  padding: 10px;
+  border-bottom: 1px solid #f1f1f1;
+  font-size: 14px;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+/* No Notification Message */
+.no-notifications {
+  text-align: center;
+  font-size: 14px;
+  color: #777;
+  padding: 15px 0;
+}
+
+/* Clear All Button */
+.clear-btn {
+  width: 100%;
+  padding: 8px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s;
+}
+
+.clear-btn:hover {
+  background-color: #cc0000;
+}

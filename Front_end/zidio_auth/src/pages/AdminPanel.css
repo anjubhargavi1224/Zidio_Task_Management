@@ -48,6 +48,16 @@
   align-items: center;
 }
 
+.custom-legend {
+  display: flex;
+  margin-top: 10px; /* Adjust as needed */
+  font-weight: bold;
+}
+
+.custom-legend div {
+  margin-right: 10px; /* Adjust this value to reduce or increase spacing */
+}
+
 /* Logout Button Styling */
 .logout{
   color: #c82333;

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { FaUsers, FaTasks, FaSignOutAlt, FaEdit, FaSave, FaTrash, FaCheck } from "react-icons/fa";
-import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import React, { useState, useEffect } from "react";
+import { FaUsers, FaTasks, FaSignOutAlt, FaEdit, FaSave, FaTrash, FaCheck, FaPlus } from "react-icons/fa";
+import { BarChart, Bar, XAxis, Tooltip, Legend } from "recharts";
+import CreateUser from "../components/CreateUser";// Import the CreateUser  component
 import "./AdminPanel.css";
 
 const AdminPanel = () => {
@@ -8,21 +9,61 @@ const AdminPanel = () => {
   const [activeSection, setActiveSection] = useState("all"); // State for task filtering
   const [selectedUser , setSelectedUser ] = useState(""); // State for user filtering
   const [tasks, setTasks] = useState([]); // State for task management
-  const [users] = useState([
-    { id: 1, name: "John Doe", email: "johndoe003@gmail.com" },
-    { id: 2, name: "Alice Smith", email: "alicesmith004@gmail.com" },
-    { id: 3, name: "Bob Johnson", email: "bobjohnson003@gmail.com" },
-    { id: 4, name: "Kim Bob", email: "bobkim005@gmail.com" },
-  ]); // Sample Users
+  const [users, setUsers] = useState([]); // State for users
+  const [chartData, setChartData] = useState([]);
+  const [showCreateUser , setShowCreateUser ] = useState(false); // State to control Create User form visibility
 
-  // Chart data for task overview
-  const data = [
-    { name: "Completed", value: tasks.filter(task => task.status === "completed").length },
-    { name: "Pending", value: tasks.filter(task => task.status !== "completed").length },
-  ];
+   // Load users and tasks from localStorage on component mount
+   useEffect(() => {
+    const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+    const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    setUsers(storedUsers);
+    setTasks(storedTasks);
+  }, []);
 
-  // Colors for the pie chart
-  const COLORS = ['#34D399', '#EF4444'];
+  // Effect to update chart data whenever tasks, activeSection, or selectedUser  changes
+  useEffect(() => {
+    const filteredTasks = tasks.filter(task => 
+      (activeSection === "all" || task.status === activeSection) &&
+      (selectedUser  === "" || task.assignedTo === selectedUser )
+    );
+
+    const completedCount = filteredTasks.filter(task => task.status === "completed").length;
+    const pendingCount = filteredTasks.filter(task => task.status !== "completed").length;
+
+    setChartData([
+      {
+        name: "Tasks",
+        completed: completedCount,
+        pending: pendingCount,
+      },
+    ]);
+  }, [tasks, activeSection, selectedUser ]);
+
+  // Custom Legend Component
+  const CustomLegend = () => (
+    <div className="custom-legend">
+      <div style={{ color: "#34D399" }}>Completed: {chartData[0]?.completed}</div>
+      <div style={{ color: "#EF4444" }}>Pending: {chartData[0]?.pending}</div>
+    </div>
+  );
+
+  // Function to handle user creation
+  const handleCreateUser  = (newUser ) => {
+    const newUserWithId = { id: Date.now(), ...newUser  }; // Assign a unique ID
+    const updatedUsers = [...users, newUserWithId];
+    setUsers(updatedUsers);
+    localStorage.setItem("users", JSON.stringify(updatedUsers)); // Save to localStorage
+  };
+
+  // Function to add a new task
+  const addTask = (newTask) => {
+    const taskWithId = { id: Date.now(), ...newTask };
+    const updatedTasks = [...tasks, taskWithId];
+    setTasks(updatedTasks);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks)); // Save to localStorage
+  };
+
 
   return (
     <div className="admin-container">
@@ -39,22 +80,13 @@ const AdminPanel = () => {
         </ul>
 
         <div className="chart-container">
-          <PieChart width={345} height={170}>
-            <Pie
-              data={data}
-              cx={150}
-              cy={150}
-              labelLine={false}
-              label={entry => entry.name}
-              outerRadius={60}
-              fill="#8884d8"
-              dataKey="value"
-            >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-          </PieChart>
+          <BarChart width={250} height={170} data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <XAxis dataKey="name" hide={true} />
+            <Tooltip />
+            <Legend content={<CustomLegend />} />
+            <Bar dataKey="completed" fill="#34D399" />
+            <Bar dataKey="pending" fill="#EF4444" />
+          </BarChart>
         </div>
 
         <div className="logout">
@@ -77,6 +109,10 @@ const AdminPanel = () => {
         {selectedTab === "users" && (
           <section className="admin-users">
             <h2>User Management</h2>
+            <button onClick={() => setShowCreateUser (true)}><FaPlus /> Create User</button>
+            {showCreateUser  && (
+              <CreateUser  onCreate={handleCreateUser } onClose={() => setShowCreateUser (false)} />
+            )}
             <table>
               <thead>
                 <tr>
@@ -112,6 +148,7 @@ const AdminPanel = () => {
             setActiveSection={setActiveSection} 
             selectedUser ={selectedUser } 
             setSelectedUser ={setSelectedUser } 
+            addTask={addTask} // Pass addTask function to AllTasks
           />
         )}
       </div>
@@ -120,7 +157,7 @@ const AdminPanel = () => {
 };
 
 // ---------------------- AllTasks Component ----------------------
-const AllTasks = ({ tasks, setTasks, users, activeSection, setActiveSection, selectedUser , setSelectedUser  }) => {
+const AllTasks = ({ tasks, setTasks, users, activeSection, setActiveSection, selectedUser , setSelectedUser , addTask }) => {
   const [showForm, setShowForm] = useState(false);
   const [newTask, setNewTask] = useState({
     title: "",
@@ -147,10 +184,9 @@ const AllTasks = ({ tasks, setTasks, users, activeSection, setActiveSection, sel
   };
 
   // Add new task
-  const addTask = () => {
+  const addNewTask = () => {
     if (newTask.title && newTask.description && newTask.startDate && newTask.endDate && newTask.assignedTo) {
-      const task = { id: Date.now(), ...newTask };
-      setTasks([...tasks, task]);
+      addTask(newTask); // Use the addTask function passed from AdminPanel
       setNewTask({ title: "", description: "", startDate: "", endDate: "", assignedTo: "", status: "inProgress" });
       setShowForm(false);
     }
@@ -197,39 +233,40 @@ const AllTasks = ({ tasks, setTasks, users, activeSection, setActiveSection, sel
 
       {/* Task Filters */}
       <div className="task-filters-admin">
+        {/* User Selection Dropdown */}
+        <label htmlFor="userFilter">Filter by User:</label>
+        <select
+          id="userFilter"
+          value={selectedUser }
+          onChange={(e) => setSelectedUser (e.target.value)}
+        >
+          <option value="">All Users</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.name}>
+              {user.name}
+            </option>
+          ))}
+        </select>
 
-          {/* User Selection Dropdown */}
-      <label htmlFor="userFilter">Filter by User:</label>
-      <select
-        id="userFilter"
-        value={selectedUser }
-        onChange={(e) => setSelectedUser (e.target.value)}
-      >
-        <option value="">All Users</option>
-        {users.map((user) => (
-          <option key={user.id} value={user.name}>
-            {user.name}
-          </option>
-        ))}
-      </select>
-
-      
         <button
           className={activeSection === "all" ? "active" : ""}
           onClick={() => setActiveSection("all")}
-        id="all-task">
+          id="all-task"
+        >
           All Tasks
         </button>
         <button
           className={activeSection === "inProgress" ? "active" : ""}
           onClick={() => setActiveSection("inProgress")}
-        id="in-progress">
+          id="in-progress"
+        >
           In Progress
         </button>
         <button
           className={activeSection === "completed" ? "active" : ""}
           onClick={() => setActiveSection("completed")}
-        id="completed">
+          id="completed"
+        >
           Completed
         </button>
       </div>
@@ -266,7 +303,7 @@ const AllTasks = ({ tasks, setTasks, users, activeSection, setActiveSection, sel
 
           <div className="TASK_FORM_BUTTONS">
             <button className="CANCEL_TASK_BTN" onClick={() => setShowForm(false)}>Cancel</button>
-            <button onClick={addTask}>Add Task</button>
+            <button onClick={addNewTask}>Add Task</button>
           </div>
         </div>
       )}

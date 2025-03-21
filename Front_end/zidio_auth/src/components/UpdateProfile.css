@@ -1,0 +1,90 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it appears above other content */
+}
+
+.modal-content {
+    background-color: #e6f3fc;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 400px; /* Set a width for the modal */
+    max-width: 90%; /* Responsive width */
+    max-height: 80vh; /* Set a maximum height for the modal */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds max height */
+}
+
+.text-section {
+    margin-bottom: 20px;
+}
+
+.title {
+    font-size: 24px;
+    margin: 0;
+}
+
+.description {
+    font-size: 16px;
+    color: #666;
+}
+
+.card {
+    margin-bottom: 20px;
+}
+
+.fieldset {
+    border: none;
+}
+
+.fieldset-label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.BTNS {
+    display: flex;
+    gap: 40px;
+}
+
+.btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.close-btn {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    background-color: #c82333;
+}
+

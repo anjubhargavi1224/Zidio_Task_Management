@@ -13,6 +13,7 @@ import "./TaskManagement.css";
 import { RadialBarChart, RadialBar, Tooltip } from "recharts";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
+import UpdateProfile from './UpdateProfile'; // Import the UpdateProfile component
 
 
 // Function to generate Gravatar image URL based on the hashed email
@@ -23,15 +24,33 @@ const getGravatarURL = (email) => {
 
 const TaskManagement = () => {
   // State for managing tasks
-  const [tasks, setTasks] = useState([]);
-  const [activeSection, setActiveSection] = useState("all"); // Filter tasks by status
-  const [showForm, setShowForm] = useState(false); // Toggle task form visibility
-  const [showProfileOptions, setShowProfileOptions] = useState(false); // Toggle profile dropdown
-  const [showProfile, setShowProfile] = useState(false); // Toggle profile details
+  const [tasks, setTasks] = useState(() => {
+    const savedTasks = localStorage.getItem("tasks");
+    return savedTasks ? JSON.parse(savedTasks) : [];
+  });
+  const [activeSection, setActiveSection] = useState("all");
+  const [showForm, setShowForm] = useState(false);
+  const [showProfileOptions, setShowProfileOptions] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showUpdateProfile, setShowUpdateProfile] = useState(false);
+  const [newNotifications, setNewNotifications] = useState(0);
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
-  // User email (Replace with dynamic email when implementing authentication)
-  const [userEmail] = useState("tejas@example.com");
-  const avatarURL = getGravatarURL(userEmail); // Get user Gravatar image
+  // User details state
+  const [userDetails, setUserDetails] = useState(() => {
+    const savedUserDetails = localStorage.getItem("userDetails");
+    return savedUserDetails ? JSON.parse(savedUserDetails) : {
+      fullName: "Tejas",
+      email: "tejas@example.com",
+      occupation: "Developer",
+      location: "City",
+      socialLinks: "LinkedIn, Twitter",
+      profilePic: getGravatarURL("tejas@example.com"),
+    };
+  });
+
+  const avatarURL = userDetails.profilePic;
 
   // State for handling new task input fields
   const [newTask, setNewTask] = useState({
@@ -43,7 +62,7 @@ const TaskManagement = () => {
   });
 
   // State for editing a task
-  const [editingTaskId, setEditingTaskId] = useState(null); // Track which task is being edited
+  const [editingTaskId, setEditingTaskId] = useState(null);
   const [editedTask, setEditedTask] = useState({
     title: "",
     description: "",
@@ -51,6 +70,9 @@ const TaskManagement = () => {
     endDate: "",
     status: "",
   });
+
+  // State for search query
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Handle input changes for adding a new task
   const handleFormChange = (e) => {
@@ -66,8 +88,10 @@ const TaskManagement = () => {
       newTask.startDate &&
       newTask.endDate
     ) {
-      const task = { id: Date.now(), ...newTask }; // Assign unique ID using timestamp
-      setTasks([...tasks, task]);
+      const task = { id: Date.now(), ...newTask };
+      const updatedTasks = [...tasks, task];
+      setTasks(updatedTasks);
+      localStorage.setItem("tasks", JSON.stringify(updatedTasks));
       setNewTask({
         title: "",
         description: "",
@@ -75,13 +99,15 @@ const TaskManagement = () => {
         endDate: "",
         status: "inProgress",
       });
-      setShowForm(false); // Close the form after adding task
+      setShowForm(false);
     }
   };
 
   // Delete a task based on its ID
   const deleteTask = (taskId) => {
-    setTasks(tasks.filter((task) => task.id !== taskId));
+    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+    setTasks(updatedTasks);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
 
   // Start editing a specific task
@@ -104,21 +130,19 @@ const TaskManagement = () => {
 
   // Save the edited task details
   const saveEdit = (taskId) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, ...editedTask } : task
-      )
+    const updatedTasks = tasks.map((task) =>
+      task.id === taskId ? { ...task, ...editedTask } : task
     );
-    setEditingTaskId(null); // Exit editing mode
+    setTasks(updatedTasks);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+    setEditingTaskId(null);
   };
 
-   // Chart data for task overview
-   const data = [
+  // Chart data for task overview
+  const data = [
     { name: "Completed", value: tasks.filter(task => task.status === "completed").length, fill: "#34D399" },
     { name: "Pending", value: tasks.filter(task => task.status !== "completed").length, fill: "#EF4444" },
   ];
-  
-
 
   // Mark a task as completed
   const completeTask = (taskId) => {
@@ -127,33 +151,65 @@ const TaskManagement = () => {
         task.id === taskId ? { ...task, status: "completed" } : task
       )
     );
-  };
-
-  // Logout function (Replace with actual logout functionality)
-  const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove stored JWT token
-    localStorage.removeItem("userRole"); // Remove role if stored
-  
-    // Redirect to login page and clear history to prevent going back
-    window.location.replace("/"); 
-  };
-  
-
-  const navigate = useNavigate(); // React Router navigation
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/"); // Redirect to login if not authenticated
+    const completedTask = tasks.find((task) => task.id === taskId);
+    if (completedTask) {
+      addNotification(`Task "${completedTask.title}" has been completed!`); // Notify user
     }
-  }, [navigate]); // Run on component mount
+  };
+
+  const clearNotifications = () => {
+    setNewNotifications(0);
+    setNotifications([]);
+    setShowNotifications(false);
+  };
+
+  const addNotification = (message) => {
+    setNotifications((prev) => [...prev, message]);
+    setNewNotifications((prev) => prev + 1);
+  };
+
+  // Calculate completed and pending counts
+  const completedCount = tasks.filter(task => task.status === "completed").length;
+  const pendingCount = tasks.filter(task => task.status !== "completed").length;
+
+  // Function to update user details
+  const updateUserDetails = (updatedDetails) => {
+    setUserDetails(updatedDetails);
+    localStorage.setItem("userDetails", JSON.stringify(updatedDetails));
+  };
+
+    // Logout function (Replace with actual logout functionality)
+    const handleLogout = () => {
+      localStorage.removeItem("token"); // Remove stored JWT token
+      localStorage.removeItem("userRole"); // Remove role if stored
+    
+      // Redirect to login page and clear history to prevent going back
+      window.location.replace("/"); 
+    };
+    
   
+    const navigate = useNavigate(); // React Router navigation
   
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/"); // Redirect to login if not authenticated
+      }
+    }, [navigate]); // Run on component mount
+    
+    
 
   return (
     <div className="task-container">
       {/* Sidebar with task filters */}
       <aside className="sidebar">
+        <div className="user-greeting">
+          <h3>Hello,</h3>
+          <h3>Welcome</h3>
+        </div>
+        <div className="User  -details">
+          <p>Manage All Your Task In One Place</p>
+        </div>
         <button
           className={activeSection === "all" ? "active" : ""}
           onClick={() => setActiveSection("all")}
@@ -173,13 +229,13 @@ const TaskManagement = () => {
           Completed
         </button>
 
-        {/**RadialBarChart */}
+        {/* RadialBarChart */}
         <div className="chart-container">
           <RadialBarChart
-            width={200}
-            height={250}
-            innerRadius="40%"
-            outerRadius="80%"
+            width={150}
+            height={150}
+            innerRadius="50%"
+            outerRadius="90%"
             data={data}
             startAngle={180}
             endAngle={0}
@@ -188,7 +244,17 @@ const TaskManagement = () => {
             <Tooltip />
           </RadialBarChart>
         </div>
-
+        {/* Display Completed and Pending Counts */}
+        <div className="task-summary">
+          <div className="summary-item">
+            <span className="summary-label-com">Completed:</span>
+            <span className="summary-value-com">{completedCount}</span>
+          </div>
+          <div className="summary-item">
+            <span className="summary-label-pen">Pending:</span>
+            <span className="summary-value-pen">{pendingCount}</span>
+          </div>
+        </div>
       </aside>
 
       {/* Main content area */}
@@ -199,17 +265,41 @@ const TaskManagement = () => {
           {/* Search bar */}
           <div className="search-box">
             <FaSearch className="search-icon" />
-            <input type="text" placeholder="Search bar" />
+            <input
+              type="text"
+              placeholder="Search by title"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
 
           {/* Profile and notification section */}
           <div className="profile-section">
-            <span className="notification-icon">🔔</span>
+            <div className="notification-container">
+              {/* Notification Bell Icon */}
+              <div className="notification-icon" onClick={() => setShowNotifications(!showNotifications)}>
+                🔔 {notifications.length > 0 && <span className="notification-badge">{notifications.length}</span>}
+              </div>
+
+              {/* Notification Dropdown */}
+              {showNotifications && (
+                <div className="notification-dropdown">
+                  {notifications.length > 0 ? (
+                    notifications.map((note, index) => (
+                      <div key={index} className="notification-item">{note}</div>
+                    ))
+                  ) : (
+                    <p className="no-notifications">No new notifications</p>
+                  )}
+                  <button className="clear-btn" onClick={clearNotifications}>Clear All</button>
+                </div>
+              )}
+            </div>
 
             {/* Profile image with dropdown options */}
             <div className="profile-container">
               <img
-                src={avatarURL} // Gravatar image
+                src={avatarURL}
                 alt="Profile"
                 className="profile-pic"
                 onClick={() => setShowProfileOptions(!showProfileOptions)}
@@ -222,7 +312,7 @@ const TaskManagement = () => {
                         className="profile-option"
                         onClick={() => setShowProfile(true)}
                       >
-                        <FaUser /> Profile
+                        <FaUser  /> Profile
                       </button>
                       <button className="profile-option" onClick={handleLogout}>
                         <FaSignOutAlt /> Logout
@@ -235,12 +325,17 @@ const TaskManagement = () => {
                         alt="Profile Pic"
                         className="profile-image"
                       />
-                      <p>Full Name</p>
-                      <p>{userEmail}</p>
-                      <p>Occupation</p>
-                      <p>Location</p>
-                      <p>Social Links</p>
-                      <button className="update-btn">Update Profile</button>
+                      <p>{userDetails.fullName}</p>
+                      <p>{userDetails.email}</p>
+                      <p>{userDetails.occupation}</p>
+                      <p>{userDetails.location}</p>
+                      <p>{userDetails.socialLinks}</p>
+                      <button
+                        className="update-btn"
+                        onClick={() => setShowUpdateProfile(true)}
+                      >
+                        Update Profile
+                      </button>
                       <button
                         className="back-btn"
                         onClick={() => setShowProfile(false)}
@@ -302,67 +397,49 @@ const TaskManagement = () => {
           </div>
         )}
 
+        {/* Render UpdateProfile component */}
+        {showUpdateProfile && (
+          <UpdateProfile
+            onClose={() => setShowUpdateProfile(false)}
+            userDetails={userDetails}
+            onUpdate={updateUserDetails}
+          />
+        )}
+
         {/* Display Tasks */}
-        <div className="task-grid">
+        <div className="TASK_GRID">
           {tasks
-            .filter(
-              (task) => activeSection === "all" || task.status === activeSection
+            .filter(task =>
+              (activeSection === "all" || task.status === activeSection) &&
+              task.title.toLowerCase().includes(searchQuery.toLowerCase())
             )
             .map((task) => (
-              <div key={task.id} className="task-card">
+              <div key={task.id} className="TASK_CARD">
                 {editingTaskId === task.id ? (
                   <>
-                    <input
-                      type="text"
-                      name="title"
-                      value={editedTask.title}
-                      onChange={handleEditChange}
-                    />
-                    <textarea
-                      name="description"
-                      value={editedTask.description}
-                      onChange={handleEditChange}
-                    />
-                    <input
-                      type="date"
-                      name="startDate"
-                      value={editedTask.startDate}
-                      onChange={handleEditChange}
-                    />
-                    <input
-                      type="date"
-                      name="endDate"
-                      value={editedTask.endDate}
-                      onChange={handleEditChange}
-                    />
-                    <FaSave
-                      className="save-icon"
-                      onClick={() => saveEdit(task.id)}
-                    />
+                    <input type="text" name="title" value={editedTask.title} onChange={handleEditChange} />
+                    <textarea name="description" value={editedTask.description} onChange={handleEditChange} />
+                    <input type="date" name="startDate" value={editedTask.startDate} onChange={handleEditChange} />
+                    <input type="date" name="endDate" value={editedTask.endDate} onChange={handleEditChange} />
+                    <div className="TASK_ACTIONS">
+                      <FaSave className="SAVE_ICON" onClick={() => saveEdit(task.id)} />
+                      <button className="CANCEL_EDIT_BTN" onClick={() => setEditingTaskId(null)}>Cancel Edit</button>
+                    </div>
                   </>
                 ) : (
                   <>
                     <h3>Title: {task.title}</h3>
                     <p>Description: {task.description}</p>
-                    <p className="task-date">
-                      Start: {task.startDate} | End: {task.endDate}
-                    </p>
-                    <FaEdit
-                      className="edit-icon"
-                      onClick={() => startEditing(task)}
-                    />
-                    <FaTrash
-                      className="delete-icon"
-                      onClick={() => deleteTask(task.id)}
-                    />
-                    {task.status !== "completed" && (
-                      <button
-                        className="complete-btn"
-                        onClick={() => completeTask(task.id)}
-                      >
-                        <FaCheck className="complete-icon" /> Complete
-                      </button>
-                    )}
+                    <p className="TASK_DATE">Start: {task.startDate} | End: {task.endDate}</p>
+                    <div className="TASK_ACTIONS">
+                      <FaEdit className="EDIT_ICON" onClick={() => startEditing(task)} />
+                      <FaTrash className="DELETE_ICON" onClick={() => deleteTask(task.id)} />
+                      {task.status !== "completed" && (
+                        <button className="COMPLETE_BTN" onClick={() => completeTask(task.id)}>
+                          <FaCheck className="COMPLETE_ICON" /> Complete
+                        </button>
+                      )}
+                    </div>
                   </>
                 )}
               </div>

@@ -1,0 +1,25 @@
+.create-user-form {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    margin-top: 10px;
+  }
+  
+  .create-user-form h2 {
+    margin-bottom: 10px;
+  }
+  
+  .create-user-form input {
+    width: 90%;
+    padding: 10px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .create-user-form button {
+    margin-right: 10px;
+  }
