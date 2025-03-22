@@ -67,9 +67,9 @@ const AdminPanel = () => {
     // Notify the assigned user
     const assignedUser  = users.find(user => user.name === newTask.assignedTo);
     if (assignedUser ) {
-      const userNotifications = JSON.parse(localStorage.getItem(`notifications_${assignedUser .id}`)) || [];
+      const userNotifications = JSON.parse(localStorage.getItem(`notifications_${assignedUser.id}`)) || [];
       userNotifications.push(`A new task "${newTask.title}" has been assigned to you.`);
-      localStorage.setItem(`notifications_${assignedUser .id}`, JSON.stringify(userNotifications));
+      localStorage.setItem(`notifications_${assignedUser.id}`, JSON.stringify(userNotifications));
     }
   };
    // Logout function (Replace with actual logout functionality)

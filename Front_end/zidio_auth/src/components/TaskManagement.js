@@ -290,7 +290,7 @@ const TaskManagement = () => {
             <div className="notification-container">
               {/* Notification Bell Icon */}
               <div className="notification-icon" onClick={() => setShowNotifications(!showNotifications)}>
-                🔔 {notifications.length > 0 && <span className="notification-badge">{notifications.length}</span>}
+                🔔 {newNotifications> 0 && <span className="notification-badge">{newNotifications}</span>}
               </div>
 
               {/* Notification Dropdown */}
