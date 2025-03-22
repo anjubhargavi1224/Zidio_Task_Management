@@ -3,6 +3,7 @@ import { FaUsers, FaTasks, FaSignOutAlt, FaEdit, FaSave, FaTrash, FaCheck, FaPlu
 import { BarChart, Bar, XAxis, Tooltip, Legend } from "recharts";
 import CreateUser  from "../components/CreateUser"; // Import the CreateUser  component
 import "./AdminPanel.css";
+import { useNavigate } from "react-router-dom"; 
 
 const AdminPanel = () => {
   const [selectedTab, setSelectedTab] = useState("dashboard");
@@ -71,6 +72,23 @@ const AdminPanel = () => {
       localStorage.setItem(`notifications_${assignedUser .id}`, JSON.stringify(userNotifications));
     }
   };
+   // Logout function (Replace with actual logout functionality)
+    const handleLogout = () => {
+      localStorage.removeItem("token"); // Remove stored JWT token
+      localStorage.removeItem("userRole"); // Remove role if stored
+  
+      // Redirect to login page and clear history to prevent going back
+      window.location.replace("/"); 
+    };
+  
+    const navigate = useNavigate(); // React Router navigation
+  
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/"); // Redirect to login if not authenticated
+      }
+    }, [navigate]); // Run on component mount
 
   return (
     <div className="admin-container">
@@ -96,7 +114,7 @@ const AdminPanel = () => {
           </BarChart>
         </div>
 
-        <div className="logout">
+        <div className="logout" onClick={handleLogout}>
           <FaSignOutAlt /><span>Logout</span>
         </div>
       </aside>
@@ -233,6 +251,25 @@ const AllTasks = ({ tasks, setTasks, users, activeSection, setActiveSection, sel
   const completeTask = (taskId) => {
     setTasks(tasks.map((task) => (task.id === taskId ? { ...task, status: "completed" } : task)));
   };
+
+
+   // Logout function (Replace with actual logout functionality)
+   const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove stored JWT token
+    localStorage.removeItem("userRole"); // Remove role if stored
+
+    // Redirect to login page and clear history to prevent going back
+    window.location.replace("/"); 
+  };
+
+  const navigate = useNavigate(); // React Router navigation
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/"); // Redirect to login if not authenticated
+    }
+  }, [navigate]); // Run on component mount
 
   return (
     <div className="MAIN_CONTENT">
