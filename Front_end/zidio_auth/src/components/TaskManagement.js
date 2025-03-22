@@ -441,8 +441,8 @@ const TaskManagement = () => {
                   </>
                 ) : (
                   <>
-                    <h3>{task.title}</h3>
-                    <p>{task.description}</p>
+                    <h3>Title: {task.title}</h3>
+                    <p>Description: {task.description}</p>
                     <p className="task-date">Start: {task.startDate} | End: {task.endDate}</p>
                     <div className="task-actions">
                       <FaEdit className="edit-icon" onClick={() => startEditing(task)} />

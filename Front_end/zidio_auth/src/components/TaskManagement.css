@@ -214,17 +214,59 @@
   padding: 15px;
   border-radius: 10px;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: auto; /* Allows height to adjust dynamically */
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  overflow: hidden;
+  flex-grow: 1; /* Ensures cards expand properly */
+}
+
+/* Task Title */
+.task-card h3 {
+  font-size: 16px;
+  font-weight: bold;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  max-width: 100%;
+  flex-shrink: 0; /* Prevents title from shrinking */
+}
+
+/* Task Description */
+.task-card p {
+  font-size: 14px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  flex-grow: 1; /* Allows content to expand dynamically */
+  overflow-y: auto;
+  max-height: 150px; /* Prevents card from stretching too much */
 }
 
 /* Task Input Fields */
 .task-card input,
 .task-card textarea,
 .task-card input[type="datetime-local"] {
-  width: 95%;
+  width: 100%;
   padding: 8px;
   margin-bottom: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  min-height: 40px;
+  flex-grow: 1; /* Expands input area properly */
+}
+
+.task-card textarea {
+  resize: vertical;
+  min-height: 100px;
+  max-height: 250px;
+  overflow-y: auto;
 }
 
 /* Task Actions */
@@ -232,6 +274,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  margin-top: auto;
 }
 
 /* Icons */
@@ -241,7 +284,6 @@
 .cancel-icon {
   cursor: pointer;
   padding: 5px;
-  padding-right: 5px;
 }
 
 /* Delete Icon */
@@ -259,7 +301,6 @@
   color: gray;
 }
 
-
 /* Responsive Media Queries */
 /* At 1024px: Change to 2 columns */
 @media (max-width: 1024px) {
@@ -268,14 +309,14 @@
   }
 }
 
-/* At 678px: Change to 1 column */
-@media (max-width: 678px) {
+/* At 768px: Change to 1 column */
+@media (max-width: 768px) {
   .task-grid {
     grid-template-columns: repeat(1, 1fr) !important;
- 
-   
   }
 }
+
+/* Extra Margin for Mobile */
 @media (max-width: 620px) {
   .task-grid {
     margin-top: 40px;
@@ -520,7 +561,7 @@
     max-width: 400px;
     max-height: 250px;
   }
-  
+
   .notification-item {
     font-size: 0.9rem;
     padding: 8px;
@@ -540,7 +581,7 @@
     max-height: 200px;
     padding: 5px;
   }
-  
+
   .notification-item {
     font-size: 0.85rem;
     padding: 6px;
@@ -560,6 +601,6 @@
     max-height: 200px;
     padding: 5px;
   }
-  
-  
+
+
 }
