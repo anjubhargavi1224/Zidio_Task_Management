@@ -1,14 +1,132 @@
+/* Profile Section Css  */
+.profile-container {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 10px auto;
+}
+
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 150px;
+}
+
+.profile-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 16px;
+    cursor: pointer;
+    color: black;
+}
+
+.profile-option:hover {
+    background: #d0eaff;
+    border-radius: 5px;
+}
+
+.profile-option svg {
+    font-size: 18px;
+}
+
+
+.profile-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    width: 250px;
+}
+
+.profile-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    text-align: left;
+}
+
+.profile-card {
+    text-align: center;
+    background: #eaf6ff;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.profile-image {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.profile-card p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.update-btn .back-btn {
+    background: #007bff;
+    color: white;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.update-btn:hover {
+    background: #0056b3;
+}
+
+
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent background */
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Ensure it appears above other content */
+    z-index: 1000;
+    /* Ensure it appears above other content */
 }
 
 .modal-content {
@@ -16,10 +134,14 @@
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 400px; /* Set a width for the modal */
-    max-width: 90%; /* Responsive width */
-    max-height: 80vh; /* Set a maximum height for the modal */
-    overflow-y: auto; /* Enable vertical scrolling if content exceeds max height */
+    width: 400px;
+    /* Set a width for the modal */
+    max-width: 90%;
+    /* Responsive width */
+    max-height: 80vh;
+    /* Set a maximum height for the modal */
+    overflow-y: auto;
+    /* Enable vertical scrolling if content exceeds max height */
 }
 
 .text-section {
@@ -88,3 +210,35 @@
     background-color: #c82333;
 }
 
+@media (max-width: 768px) {
+
+
+    .modal-content {
+        width: 90%;
+        max-width: 350px;
+    }
+
+    .profile-option {
+        font-size: 14px;
+        padding: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-image {
+        width: 50px;
+        height: 50px;
+    }
+
+    .BTNS {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .btn,
+    .close-btn {
+        width: 100%;
+        text-align: center;
+    }
+}

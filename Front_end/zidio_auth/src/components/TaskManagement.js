@@ -6,12 +6,12 @@ import {
   FaTrash,
   FaSave,
   FaCheck,
-  FaUser ,
+  FaUser,
   FaSignOutAlt,
 } from "react-icons/fa";
 import "./TaskManagement.css";
 import { RadialBarChart, RadialBar, Tooltip } from "recharts";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import UpdateProfile from './UpdateProfile'; // Import the UpdateProfile component
 
 // Function to generate Gravatar image URL based on the hashed email
@@ -199,7 +199,7 @@ const TaskManagement = () => {
     localStorage.removeItem("userRole"); // Remove role if stored
 
     // Redirect to login page and clear history to prevent going back
-    window.location.replace("/"); 
+    window.location.replace("/");
   };
 
   const navigate = useNavigate(); // React Router navigation
@@ -213,6 +213,97 @@ const TaskManagement = () => {
 
   return (
     <div className="task-container">
+
+      <header className="top-header">
+        <h2>Task Management</h2>
+
+        {/* Search bar */}
+        <div className="search-box">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search by title"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        {/* Profile and notification section */}
+        <div className="profile-section">
+          <div className="notification-container">
+            {/* Notification Bell Icon */}
+            <div className="notification-icon" onClick={() => setShowNotifications(!showNotifications)}>
+              🔔 {newNotifications > 0 && <span className="notification-badge">{newNotifications}</span>}
+            </div>
+
+            {/* Notification Dropdown */}
+            {showNotifications && (
+              <div className="notification-dropdown">
+                {notifications.length > 0 ? (
+                  notifications.map((note, index) => (
+                    <div key={index} className="notification-item">{note}</div>
+                  ))
+                ) : (
+                  <p className="no-notifications">No new notifications</p>
+                )}
+                <button className="clear-btn" onClick={clearNotifications}>Clear All</button>
+              </div>
+            )}
+          </div>
+
+          {/* Profile image with dropdown options */}
+          <div className="profile-container">
+            <img
+              src={avatarURL}
+              alt="Profile"
+              className="profile-pic"
+              onClick={() => setShowProfileOptions(!showProfileOptions)}
+            />
+            {showProfileOptions && (
+              <div className="profile-dropdown">
+                {!showProfile ? (
+                  <>
+                    <button
+                      className="profile-option"
+                      onClick={() => setShowProfile(true)}
+                    >
+                      <FaUser /> Profile
+                    </button>
+                    <button className="profile-option" onClick={handleLogout}>
+                      <FaSignOutAlt /> Logout
+                    </button>
+                  </>
+                ) : (
+                  <div className="profile-card">
+                    <img
+                      src={avatarURL}
+                      alt="Profile Pic"
+                      className="profile-image"
+                    />
+                    <p>{userDetails.fullName}</p>
+                    <p>{userDetails.email}</p>
+                    <p>{userDetails.occupation}</p>
+                    <p>{userDetails.location}</p>
+                    <p>{userDetails.socialLinks}</p>
+                    <button
+                      className="update-btn"
+                      onClick={() => setShowUpdateProfile(true)}
+                    >
+                      Update Profile
+                    </button>
+                    <button
+                      className="back-btn"
+                      onClick={() => setShowProfile(false)}
+                    >
+                      Back
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
       {/* Sidebar with task filters */}
       <aside className="sidebar">
         <div className="user-greeting">
@@ -271,96 +362,6 @@ const TaskManagement = () => {
 
       {/* Main content area */}
       <div className="main-content">
-        <header className="top-header">
-          <h2>Task Management</h2>
-
-          {/* Search bar */}
-          <div className="search-box">
-            <FaSearch className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search by title"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          {/* Profile and notification section */}
-          <div className="profile-section">
-            <div className="notification-container">
-              {/* Notification Bell Icon */}
-              <div className="notification-icon" onClick={() => setShowNotifications(!showNotifications)}>
-                🔔 {newNotifications> 0 && <span className="notification-badge">{newNotifications}</span>}
-              </div>
-
-              {/* Notification Dropdown */}
-              {showNotifications && (
-                <div className="notification-dropdown">
-                  {notifications.length > 0 ? (
-                    notifications.map((note, index) => (
-                      <div key={index} className="notification-item">{note}</div>
-                    ))
-                  ) : (
-                    <p className="no-notifications">No new notifications</p>
-                  )}
-                  <button className="clear-btn" onClick={clearNotifications}>Clear All</button>
-                </div>
-              )}
-            </div>
-
-            {/* Profile image with dropdown options */}
-            <div className="profile-container">
-              <img
-                src={avatarURL}
-                alt="Profile"
-                className="profile-pic"
-                onClick={() => setShowProfileOptions(!showProfileOptions)}
-              />
-              {showProfileOptions && (
-                <div className="profile-dropdown">
-                  {!showProfile ? (
-                    <>
-                      <button
-                        className="profile-option"
-                        onClick={() => setShowProfile(true)}
-                      >
-                        <FaUser  /> Profile
-                      </button>
-                      <button className="profile-option" onClick={handleLogout}>
-                        <FaSignOutAlt /> Logout
-                      </button>
-                    </>
-                  ) : (
-                    <div className="profile-card">
-                      <img
-                        src={avatarURL}
-                        alt="Profile Pic"
-                        className="profile-image"
-                      />
-                      <p>{userDetails.fullName}</p>
-                      <p>{userDetails.email}</p>
-                      <p>{userDetails.occupation}</p>
-                      <p>{userDetails.location}</p>
-                      <p>{userDetails.socialLinks}</p>
-                      <button
-                        className="update-btn"
-                        onClick={() => setShowUpdateProfile(true)}
-                      >
-                        Update Profile
-                      </button>
-                      <button
-                        className="back-btn"
-                        onClick={() => setShowProfile(false)}
-                      >
-                        Back
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </header>
 
         {/* Add Task Button */}
         {activeSection === "all" && (
@@ -419,36 +420,36 @@ const TaskManagement = () => {
         )}
 
         {/* Display Tasks */}
-        <div className="TASK_GRID">
+        <div className="task-grid">
           {tasks
             .filter(task =>
               (activeSection === "all" || task.status === activeSection) &&
               task.title.toLowerCase().includes(searchQuery.toLowerCase())
             )
             .map((task) => (
-              <div key={task.id} className="TASK_CARD">
+              <div key={task.id} className="task-card">
                 {editingTaskId === task.id ? (
                   <>
                     <input type="text" name="title" value={editedTask.title} onChange={handleEditChange} />
                     <textarea name="description" value={editedTask.description} onChange={handleEditChange} />
                     <input type="date" name="startDate" value={editedTask.startDate} onChange={handleEditChange} />
                     <input type="date" name="endDate" value={editedTask.endDate} onChange={handleEditChange} />
-                    <div className="TASK_ACTIONS">
-                      <FaSave className="SAVE_ICON" onClick={() => saveEdit(task.id)} />
-                      <button className="CANCEL_EDIT_BTN" onClick={() => setEditingTaskId(null)}>Cancel Edit</button>
+                    <div className="task-actions">
+                      <FaSave className="save-icon" onClick={() => saveEdit(task.id)} />
+                      <button className="cancel-btn" onClick={() => setEditingTaskId(null)}>Cancel</button>
                     </div>
                   </>
                 ) : (
                   <>
-                    <h3>Title: {task.title}</h3>
-                    <p>Description: {task.description}</p>
-                    <p className="TASK_DATE">Start: {task.startDate} | End: {task.endDate}</p>
-                    <div className="TASK_ACTIONS">
-                      <FaEdit className="EDIT_ICON" onClick={() => startEditing(task)} />
-                      <FaTrash className="DELETE_ICON" onClick={() => deleteTask(task.id)} />
+                    <h3>{task.title}</h3>
+                    <p>{task.description}</p>
+                    <p className="task-date">Start: {task.startDate} | End: {task.endDate}</p>
+                    <div className="task-actions">
+                      <FaEdit className="edit-icon" onClick={() => startEditing(task)} />
+                      <FaTrash className="delete-icon" onClick={() => deleteTask(task.id)} />
                       {task.status !== "completed" && (
-                        <button className="COMPLETE_BTN" onClick={() => completeTask(task.id)}>
-                          <FaCheck className="COMPLETE_ICON" /> Complete
+                        <button className="complete-btn" onClick={() => completeTask(task.id)}>
+                          <FaCheck className="complete-icon" /> Complete
                         </button>
                       )}
                     </div>
@@ -457,6 +458,7 @@ const TaskManagement = () => {
               </div>
             ))}
         </div>
+
       </div>
     </div>
   );
