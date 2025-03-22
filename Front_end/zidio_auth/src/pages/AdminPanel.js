@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaUsers, FaTasks, FaSignOutAlt, FaEdit, FaSave, FaTrash, FaCheck, FaPlus } from "react-icons/fa";
 import { BarChart, Bar, XAxis, Tooltip, Legend } from "recharts";
-import CreateUser  from "../components/CreateUser "; // Import the CreateUser  component
+import CreateUser  from "../components/CreateUser"; // Import the CreateUser  component
 import "./AdminPanel.css";
 
 const AdminPanel = () => {
