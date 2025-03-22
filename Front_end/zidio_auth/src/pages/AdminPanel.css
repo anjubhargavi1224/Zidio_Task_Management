@@ -383,7 +383,7 @@ button:hover {
   filter: brightness(90%);
 }
 
-  /*Tak Filters*/
+  /*Task Filters*/
   .task-filters-admin {
     margin: 10px 0; /* Add some margin for spacing */
     display: flex;
@@ -415,4 +415,86 @@ button:hover {
   #userFilter{
     background-color: #D3D3D3;
   }
+@media (min-width:900px) and (max-width: 940px){
+  .admin-container{
+    width: 100vw;
+    height: 100vh;
+  }
+  .admin-content{
+    width: 100vw;
+    height: 100vh;
+  }
+}
 
+@media (min-width:770px) and (max-width: 899px) {
+  .admin-container{
+   width: 100vw;
+   height: 100vh;
+  }
+  .admin-content{
+    padding: 15px;
+  }
+  .TASK_GRID{
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+}
+
+@media (min-width:400px) and (max-width: 600px){
+  .admin-sidebar{
+    width: 180px;
+    gap: 120px;
+  }
+  .chart-container{
+    width: 180px;
+  }
+  .custom-legend{
+    font-size: 11px;
+  }
+  .admin-sidebar li{
+    font-size: 17px;
+  }
+  .admin-sidebar span{
+    font-size: 17px;
+  }
+  .admin-sidebar h2{
+    font-size: 25px;
+  }
+  .admin-header h1{
+    font-size: 24px;
+  }
+  .admin-container{
+    width: 100vw;
+    height: 100vh;
+   }
+   .admin-content{
+    padding: 20px;
+  }
+  .TASK_GRID{
+    display: flex;
+    flex-direction: column;
+  }
+  .TASK_CARD{
+    width: 130px;
+  }
+  .task-filters-admin{
+    gap: 10px;
+    flex-direction: column;
+  }
+  }
+  @media (min-width:600px) and (max-width: 770px){
+    .admin-container{
+      width: 100vw;
+      height: 100vh;
+     }
+     .admin-content{
+      padding: 20px;
+    }
+    .TASK_GRID{
+      grid-template-columns: repeat(1, 1fr);
+    }
+    .task-filters-admin{
+      gap: 10px;
+      flex-direction: column;
+    }
+    }
