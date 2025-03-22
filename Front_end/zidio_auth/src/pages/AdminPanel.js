@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaUsers, FaTasks, FaSignOutAlt, FaEdit, FaSave, FaTrash, FaCheck, FaPlus } from "react-icons/fa";
 import { BarChart, Bar, XAxis, Tooltip, Legend } from "recharts";
-import CreateUser  from "../components/CreateUser "; // Import the CreateUser  component
+import CreateUser  from "../components/CreateUser"; // Import the CreateUser  component
 import "./AdminPanel.css";
 
 const AdminPanel = () => {
@@ -66,9 +66,9 @@ const AdminPanel = () => {
     // Notify the assigned user
     const assignedUser  = users.find(user => user.name === newTask.assignedTo);
     if (assignedUser ) {
-      const userNotifications = JSON.parse(localStorage.getItem(`notifications_${assignedUser .id}`)) || [];
+      const userNotifications = JSON.parse(localStorage.getItem(`notifications_${assignedUser.id}`)) || [];
       userNotifications.push(`A new task "${newTask.title}" has been assigned to you.`);
-      localStorage.setItem(`notifications_${assignedUser .id}`, JSON.stringify(userNotifications));
+      localStorage.setItem(`notifications_${assignedUser.id}`, JSON.stringify(userNotifications));
     }
   };
 
