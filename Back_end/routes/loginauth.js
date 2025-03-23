@@ -8,8 +8,7 @@ import crypto from "crypto";
 
 dotenv.config();
 const router = express.Router();
-
-// **Register Route (User & Admin)**
+// *Register Route (User & Admin)*
 router.post("/register", async (req, res) => {
     try {
         const { username, email, password, role } = req.body;
@@ -31,11 +30,22 @@ router.post("/register", async (req, res) => {
             role: role || "user",
         });
 
-        res.status(201).json({ message: "Registration successful", user: { username, email, role } });
+        // Generate JWT Token
+        const token = jwt.sign(
+            { id: newUser._id, email: newUser.email, role: newUser.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        res.status(201).json({
+            message: "Registration successful",
+            user: { username: newUser.username, email: newUser.email, role: newUser.role },
+            token
+        });
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+        res.status(500).json({ error: error.message });
+    }
 });
 
 // **Login Route (User & Admin)**
