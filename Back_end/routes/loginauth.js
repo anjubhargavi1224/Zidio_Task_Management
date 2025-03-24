@@ -44,10 +44,9 @@ router.post("/register", async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+        res.status(500).json({ error: error.message });
+    }
 });
-
 // **Login Route (User & Admin)**
 router.post("/login", async (req, res) => {
     try {
@@ -90,8 +89,6 @@ router.post("/logout", (req, res) => {
         res.status(500).json({ error: "Logout failed" });
     }
 });
-
-
 
 // **Forgot Password Route**
 router.post("/forgot-password", async (req, res) => {
@@ -164,6 +161,8 @@ router.post("/reset-password/:token", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+
 
 // Get all users
 router.get("/users", async (req, res) => {

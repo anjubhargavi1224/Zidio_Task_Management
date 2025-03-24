@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import './CreateUser.css'; 
 
-const CreateUser  = ({ onCreate, onClose }) => {
+const CreateUser  = ({ onCreate = () => {}, onClose }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (name && email) {
-      onCreate({ name, email });
+    if (name && email && password) {
+      onCreate({ name, email, password });
       onClose(); // Close the form after creating the user
     }
   };
@@ -35,6 +36,15 @@ const CreateUser  = ({ onCreate, onClose }) => {
             required
           />
         </div>
+        <div>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
         <button type="submit">Create User</button>
         <button type="button" onClick={onClose}>Cancel</button>
       </form>
@@ -42,4 +52,4 @@ const CreateUser  = ({ onCreate, onClose }) => {
   );
 };
 
-export default CreateUser ;
+export default CreateUser;
