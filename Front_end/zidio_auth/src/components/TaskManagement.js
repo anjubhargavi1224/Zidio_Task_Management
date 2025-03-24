@@ -30,6 +30,7 @@ const TaskManagement = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const{user, setUser} = useContext(AuthContext);
 
+<<<<<<< HEAD
   // user details
   const [userDetails, setUserDetails] = useState(null);
   const [avatarURL, setAvatarURL] = useState(getGravatarURL("fallback@example.com"));
@@ -40,6 +41,51 @@ const TaskManagement = () => {
   }, [userDetails?.email])
 
 // task fields
+=======
+  // User details state
+  const [userDetails, setUserDetails] = useState(() => {
+    const savedUserDetails = localStorage.getItem("userDetails");
+    return savedUserDetails ? JSON.parse(savedUserDetails) : {
+      fullName: "Name",
+      email: "example@gmail.com",
+      occupation: "Developer",
+      location: "City",
+      socialLinks: "LinkedIn, Twitter",
+      profilePic: getGravatarURL("tejas@example.com"),
+    };
+  });
+
+  const avatarURL = userDetails.profilePic;
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`http://localhost:5000/auth/users`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const users = await response.json();
+            const loggedInUser = users.find((u) => u.email === user.email);
+            console.log(user);
+
+            if (loggedInUser) {
+                setUserDetails(loggedInUser);
+                localStorage.setItem("userDetails", JSON.stringify(loggedInUser));
+            }
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+        }
+    };
+
+    fetchUserDetails();
+}, []);
+
+
+
+
+  // State for handling new task input fields
+>>>>>>> 872678f7053ebfab1436d7cb1c96d3b62329cc9d
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
@@ -231,6 +277,104 @@ const TaskManagement = () => {
 
   return (
     <div className="task-container">
+<<<<<<< HEAD
+=======
+
+      <header className="top-header">
+        <h2>Task Management</h2>
+
+        {/* Search bar */}
+        <div className="search-box">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search by title"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        {/* Profile and notification section */}
+        <div className="profile-section">
+          <div className="notification-container">
+            {/* Notification Bell Icon */}
+            <div className="notification-icon" onClick={() => setShowNotifications(!showNotifications)}>
+              🔔 {newNotifications > 0 && <span className="notification-badge">{newNotifications}</span>}
+            </div>
+
+            {/* Notification Dropdown */}
+            {showNotifications && (
+              <div className="notification-dropdown">
+                {notifications.length > 0 ? (
+                  notifications.map((note, index) => (
+                    <div key={index} className="notification-item">{note}</div>
+                  ))
+                ) : (
+                  <p className="no-notifications">No new notifications</p>
+                )}
+                <button className="clear-btn" onClick={clearNotifications}>Clear All</button>
+              </div>
+            )}
+          </div>
+
+          {/* Profile image with dropdown options */}
+          <div className="profile-container">
+            <img
+              src={avatarURL}
+              alt="Profile"
+              className="profile-pic"
+              onClick={() => setShowProfileOptions(!showProfileOptions)}
+            />
+            {showProfileOptions && (
+              <div className="profile-dropdown">
+                {!showProfile ? (
+                  <>
+                    <button
+                      className="profile-option"
+                      onClick={() => setShowProfile(true)}
+                    >
+                      <FaUser /> Profile
+                    </button>
+                    <button className="profile-option" onClick={handleLogout}>
+                      <FaSignOutAlt /> Logout
+                    </button>
+                  </>
+                ) : (
+                  <div className="profile-card">
+                    <img
+                      src={avatarURL}
+                      alt="Profile Pic"
+                      className="profile-image"
+                    />
+                    
+                    <p>{user?.username}</p>
+                    <p>{user?.role}</p>
+                    <p>{user?.email}</p>
+                    <p>{user?.occupation}</p>
+                    <p>{user?.location}</p>
+                    <p>{user?.socialLinks}</p>
+                    
+                
+                    <button
+                      className="update-btn"
+                      onClick={() => setShowUpdateProfile(true)}
+                    >
+                      Update Profile
+                    </button>
+                    <button
+                      className="back-btn"
+                      onClick={() => setShowProfile(false)}
+                    >
+                      Back
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+>>>>>>> 872678f7053ebfab1436d7cb1c96d3b62329cc9d
       {/* Sidebar with task filters */}
       <aside className="sidebar">
         <div className="user-greeting">

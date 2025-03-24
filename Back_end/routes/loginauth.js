@@ -9,6 +9,8 @@ import crypto from "crypto";
 
 dotenv.config();
 const router = express.Router();
+
+
 // *Register Route (User & Admin)*
 router.post("/register", async (req, res) => {
     try {
@@ -38,9 +40,10 @@ router.post("/register", async (req, res) => {
             { expiresIn: "7d" }
         );
 
+        // Send response with token and user details
         res.status(201).json({
             message: "Registration successful",
-            user: {  username: user.username, email: user.email, role: user.role, occupation: user.occupation, location: user.location, profileImage: user.profileImage},
+            user: { username: newUser.username, email: newUser.email, role: newUser.role },
             token
         });
 
@@ -48,6 +51,7 @@ router.post("/register", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 // **Login Route (User & Admin)**
 router.post("/login", async (req, res) => {
     try {
@@ -92,6 +96,7 @@ router.post("/logout", (req, res) => {
 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Route to get logged-in user's profile info
 router.get("/me", verifyToken, async (req, res) => {
     try {
@@ -118,6 +123,29 @@ router.get("/me", verifyToken, async (req, res) => {
             user: updatedUser
         });
 =======
+=======
+
+
+
+
+
+// Get all users
+router.get("/users", async (req, res) => {
+    try {
+        const users = await User.find({}, "-password"); // Exclude password for security
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ error: "Error fetching users" });
+    }
+});
+
+
+
+
+
+
+
+>>>>>>> 872678f7053ebfab1436d7cb1c96d3b62329cc9d
 // **Forgot Password Route**
 router.post("/forgot-password", async (req, res) => {
     try {
@@ -195,18 +223,46 @@ router.post("/reset-password/:token", async (req, res) => {
 =======
 
 
-// Get all users
-router.get("/users", async (req, res) => {
+
+
+
+router.put("/update-profile/:id", async (req, res) => {
     try {
-        const users = await User.find({}, "-password"); // Exclude password for security
-        res.status(200).json(users);
+        const { id } = req.params;
+        const { username, email, occupation, location, profileImage, socialLinks  } = req.body;
+
+        // Check if user exists
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Update user details
+        user.username = username || user.username;
+        user.email = email || user.email;
+        user.occupation = occupation || user.occupation;
+        user.location = location || user.location;
+        user.profileImage = profileImage || user.profileImage;
+        user.socialLinks = socialLinks || user.socialLinks;
+
+        await user.save();
+
+        res.status(200).json({ message: "Profile updated successfully", user });
     } catch (error) {
-        res.status(500).json({ error: "Error fetching users" });
+        res.status(500).json({ error: error.message });
     }
 });
 
 
 
 
+<<<<<<< HEAD
 >>>>>>> e09db5f1581734b8ccafbc79c26264e9da4bbd72
+=======
+
+
+
+
+
+>>>>>>> 872678f7053ebfab1436d7cb1c96d3b62329cc9d
 export default router;

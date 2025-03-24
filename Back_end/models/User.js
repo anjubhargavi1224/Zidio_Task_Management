@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    socialLinks: {
+      type: Map,
+      required: false,
+    },
     role: {
       type: String,
       required: true,
