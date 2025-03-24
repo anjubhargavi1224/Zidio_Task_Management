@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { verifyToken } from "../middleware/authmiddleware.js";
 import User from "../models/User.js"; // Ensure this is the correct model path
 import dotenv from "dotenv";
 
@@ -78,4 +79,35 @@ router.post("/logout", (req, res) => {
         res.status(500).json({ error: "Logout failed" });
     }
 });
+
+// Route to get logged-in user's profile info
+router.get("/me", verifyToken, async (req, res) => {
+    try {
+        const {fullName, email, occupation, location, socialLinks, profilePic} = req.body;
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id,
+            {
+                fullName,
+                email,
+                occupation,
+                location,
+                socialLinks,
+                profilePic
+            },
+            {new: true} //return updated document
+        ).select("_password"); //exclude password
+
+        if(!updatedUser){
+            return res.status(404).json({error: "user not found"});
+        }
+
+        res.status(200).json({
+            message: "Profile updated successfully",
+            user: updatedUser
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;

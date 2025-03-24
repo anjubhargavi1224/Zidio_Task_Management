@@ -1,56 +1,47 @@
+// TaskManagement.js
 import React, { useState, useEffect } from "react";
-import md5 from "blueimp-md5"; // Import MD5 for hashing emails
+import axios from "axios";
+import md5 from "blueimp-md5";
 import {
   FaSearch,
   FaEdit,
   FaTrash,
   FaSave,
   FaCheck,
-  FaUser ,
+  // FaUser,
   FaSignOutAlt,
 } from "react-icons/fa";
 import "./TaskManagement.css";
 import { RadialBarChart, RadialBar, Tooltip } from "recharts";
-import { useNavigate } from "react-router-dom"; 
-import UpdateProfile from './UpdateProfile'; // Import the UpdateProfile component
+import { useNavigate } from "react-router-dom";
+import UpdateProfile from "./UpdateProfile";
 
-// Function to generate Gravatar image URL based on the hashed email
+
 const getGravatarURL = (email) => {
-  const hash = md5(email.trim().toLowerCase()); // Generate MD5 hash
+  const hash = md5(email.trim().toLowerCase());
   return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
 };
 
 const TaskManagement = () => {
-  // State for managing tasks
-  const [tasks, setTasks] = useState(() => {
-    const savedTasks = localStorage.getItem("tasks");
-    return savedTasks ? JSON.parse(savedTasks) : [];
-  });
+  const [tasks, setTasks] = useState([]);
   const [activeSection, setActiveSection] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [showProfileOptions, setShowProfileOptions] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
+  // const [showProfile, setShowProfile] = useState(false);
   const [showUpdateProfile, setShowUpdateProfile] = useState(false);
-  const [newNotifications, setNewNotifications] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  // User details state
-  const [userDetails, setUserDetails] = useState(() => {
-    const savedUserDetails = localStorage.getItem("userDetails");
-    return savedUserDetails ? JSON.parse(savedUserDetails) : {
-      fullName: "Tejas",
-      email: "tejas@example.com",
-      occupation: "Developer",
-      location: "City",
-      socialLinks: "LinkedIn, Twitter",
-      profilePic: getGravatarURL("tejas@example.com"),
-    };
-  });
+  // user details
+  const [userDetails, setUserDetails] = useState(null);
+  const [avatarURL, setAvatarURL] = useState(getGravatarURL("fallback@example.com"));
+  useEffect(() => {
+    if(userDetails?.email) {
+      setAvatarURL(getGravatarURL(userDetails.email));
+    }
+  }, [userDetails?.email])
 
-  const avatarURL = userDetails.profilePic;
-
-  // State for handling new task input fields
+// task fields
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
@@ -59,7 +50,6 @@ const TaskManagement = () => {
     status: "inProgress",
   });
 
-  // State for editing a task
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editedTask, setEditedTask] = useState({
     title: "",
@@ -69,35 +59,64 @@ const TaskManagement = () => {
     status: "",
   });
 
-  // State for search query
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
-  // Load notifications from localStorage
+  // Fetch tasks on mount
   useEffect(() => {
-    const userId = userDetails.email; // Assuming user ID is based on email for simplicity
-    const savedNotifications = JSON.parse(localStorage.getItem(`notifications_${userId}`)) || [];
-    setNotifications(savedNotifications);
-    setNewNotifications(savedNotifications.length);
-  }, [userDetails.email]);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.log("No token, redirecting ...");
+      return navigate("/");
+    }
+    const fetchTasksAndUser = async () => {
+      try {
+        // Fetch tasks
+        const taskRes = await axios.get("/api/tasks", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setTasks(taskRes.data);
 
-  // Handle input changes for adding a new task
+        // Fetch logged-in user profile
+        const userRes = await axios.get("/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // TEMPORARY MOCKING FOR TESTING
+        const user = userRes.data.user;
+        const profilePic = getGravatarURL(user.email);
+        const updatedUser = {
+          fullName: user.fullName || "N/A",
+          email: user.email,
+          occupation: user.occupation || "N/A",
+          location: user.location || "N/A",
+          socialLinks: user.socialLinks || "N/A",
+          profilePic,
+        };
+
+        setUserDetails(updatedUser);
+        localStorage.setItem("userDetails", JSON.stringify(updatedUser));
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+
+    fetchTasksAndUser();
+  }, []);
+
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setNewTask({ ...newTask, [name]: value });
   };
 
-  // Add a new task to the task list
-  const addTask = () => {
-    if (
-      newTask.title &&
-      newTask.description &&
-      newTask.startDate &&
-      newTask.endDate
-    ) {
-      const task = { id: Date.now(), ...newTask };
-      const updatedTasks = [...tasks, task];
-      setTasks(updatedTasks);
-      localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  // task add
+  const addTask = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.post("/api/tasks", newTask, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTasks((prev) => [...prev, res.data]);
       setNewTask({
         title: "",
         description: "",
@@ -106,22 +125,28 @@ const TaskManagement = () => {
         status: "inProgress",
       });
       setShowForm(false);
-
-      // Notify the user about the new task
-      addNotification(`A new task "${newTask.title}" has been assigned to you.`);
+      addNotification(`A new task "${res.data.title}" has been added.`);
+    } catch (err) {
+      console.error("Error adding task:", err);
     }
   };
 
-  // Delete a task based on its ID
-  const deleteTask = (taskId) => {
-    const updatedTasks = tasks.filter((task) => task.id !== taskId);
-    setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  // delete task
+  const deleteTask = async (taskId) => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(`/api/tasks/${taskId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTasks(tasks.filter((task) => task._id !== taskId));
+    } catch (err) {
+      console.error("Error deleting task:", err);
+    }
   };
 
-  // Start editing a specific task
+  // edit task
   const startEditing = (task) => {
-    setEditingTaskId(task.id);
+    setEditingTaskId(task._id);
     setEditedTask({
       title: task.title,
       description: task.description,
@@ -131,97 +156,87 @@ const TaskManagement = () => {
     });
   };
 
-  // Handle input changes while editing a task
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditedTask({ ...editedTask, [name]: value });
   };
 
-  // Save the edited task details
-  const saveEdit = (taskId) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, ...editedTask } : task
-    );
-    setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-    setEditingTaskId(null);
-  };
-
-  // Chart data for task overview
-  const data = [
-    { name: "Completed", value: tasks.filter(task => task.status === "completed").length, fill: "#34D399" },
-    { name: "Pending", value: tasks.filter(task => task.status !== "completed").length, fill: "#EF4444" },
-  ];
-
-  // Mark a task as completed
-  const completeTask = (taskId) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, status: "completed" } : task
-      )
-    );
-    const completedTask = tasks.find((task) => task.id === taskId);
-    if (completedTask) {
-      addNotification(`Task "${completedTask.title}" has been completed!`); // Notify user
+  // task save
+  const saveEdit = async (taskId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.put(`/api/tasks/${taskId}`, editedTask, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTasks(tasks.map((task) => (task._id === taskId ? res.data : task)));
+      setEditingTaskId(null);
+    } catch (err) {
+      console.error("Error saving edit:", err);
     }
   };
 
+  // task marked for complete
+  const completeTask = async (taskId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const taskToUpdate = tasks.find((task) => task._id === taskId);
+      if (!taskToUpdate) return;
+
+      const updatedTask = { ...taskToUpdate, status: "completed" };
+      const res = await axios.put(`/api/tasks/${taskId}`, updatedTask, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTasks(tasks.map((task) => (task._id === taskId ? res.data : task)));
+      addNotification(`Task "${taskToUpdate.title}" marked as completed.`);
+    } catch (err) {
+      console.error("Error completing task:", err);
+    }
+  };
+
+  // notification button
+  const addNotification = (message) => {
+    const updated = [...notifications, message];
+    setNotifications(updated);
+    localStorage.setItem("notifications", JSON.stringify(updated));
+  };
+
+  // notification clear
   const clearNotifications = () => {
-    const userId = userDetails.email; // Assuming user ID is based on email for simplicity
-    localStorage.removeItem(`notifications_${userId}`);
     setNotifications([]);
-    setNewNotifications(0);
+    localStorage.removeItem("notifications");
     setShowNotifications(false);
   };
 
-  const addNotification = (message) => {
-    const userId = userDetails.email; // Assuming user ID is based on email for simplicity
-    const userNotifications = JSON.parse(localStorage.getItem(`notifications_${userId}`)) || [];
-    userNotifications.push(message);
-    localStorage.setItem(`notifications_${userId}`, JSON.stringify(userNotifications));
-    setNotifications(userNotifications);
-    setNewNotifications(userNotifications.length);
+  // update profile option
+  const updateUserDetails = (updated) => {
+    setUserDetails(updated);
+    localStorage.setItem("userDetails", JSON.stringify(updated));
   };
 
-  // Calculate completed and pending counts
-  const completedCount = tasks.filter(task => task.status === "completed").length;
-  const pendingCount = tasks.filter(task => task.status !== "completed").length;
-
-  // Function to update user details
-  const updateUserDetails = (updatedDetails) => {
-    setUserDetails(updatedDetails);
-    localStorage.setItem("userDetails", JSON.stringify(updatedDetails));
-  };
-
-  // Logout function (Replace with actual logout functionality)
+  // logout option from profile
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove stored JWT token
-    localStorage.removeItem("userRole"); // Remove role if stored
-
-    // Redirect to login page and clear history to prevent going back
-    window.location.replace("/"); 
+    localStorage.removeItem("token");
+    localStorage.removeItem("userRole");
+    navigate("/");
   };
 
-  const navigate = useNavigate(); // React Router navigation
+  // task complete and inprogress functionality
+  const completedCount = tasks.filter((t) => t.status === "completed").length;
+  const pendingCount = tasks.filter((t) => t.status !== "completed").length;
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/"); // Redirect to login if not authenticated
-    }
-  }, [navigate]); // Run on component mount
+  const chartData = [
+    { name: "Completed", value: completedCount, fill: "#34D399" },
+    { name: "Pending", value: pendingCount, fill: "#EF4444" },
+  ];
 
+  // task management full interface
   return (
     <div className="task-container">
-      {/* Sidebar with task filters */}
       <aside className="sidebar">
         <div className="user-greeting">
-          <h3>Hello,</h3>
-          <h3>Welcome</h3>
+          <h3>Hello, Welcome</h3>
         </div>
-        <div className="User -details">
-          <p>Manage All Your Task In One Place</p>
-        </div>
+        <p>Manage All Your Task In One Place</p>
         <button
           className={activeSection === "all" ? "active" : ""}
           onClick={() => setActiveSection("all")}
@@ -241,14 +256,13 @@ const TaskManagement = () => {
           Completed
         </button>
 
-        {/* RadialBarChart */}
         <div className="chart-container">
           <RadialBarChart
             width={150}
             height={150}
             innerRadius="50%"
             outerRadius="90%"
-            data={data}
+            data={chartData}
             startAngle={180}
             endAngle={0}
           >
@@ -256,25 +270,22 @@ const TaskManagement = () => {
             <Tooltip />
           </RadialBarChart>
         </div>
-        {/* Display Completed and Pending Counts */}
+
         <div className="task-summary">
-          <div className="summary-item">
-            <span className="summary-label-com">Completed:</span>
-            <span className="summary-value-com">{completedCount}</span>
+          <div>
+            <span className="summary-label-com">Completed:</span>{" "}
+            <span>{completedCount}</span>
           </div>
-          <div className="summary-item">
-            <span className="summary-label-pen">Pending:</span>
-            <span className="summary-value-pen">{pendingCount}</span>
+          <div>
+            <span className="summary-label-pen">Pending:</span>{" "}
+            <span>{pendingCount}</span>
           </div>
         </div>
       </aside>
 
-      {/* Main content area */}
       <div className="main-content">
         <header className="top-header">
           <h2>Task Management</h2>
-
-          {/* Search bar */}
           <div className="search-box">
             <FaSearch className="search-icon" />
             <input
@@ -285,30 +296,36 @@ const TaskManagement = () => {
             />
           </div>
 
-          {/* Profile and notification section */}
           <div className="profile-section">
             <div className="notification-container">
-              {/* Notification Bell Icon */}
-              <div className="notification-icon" onClick={() => setShowNotifications(!showNotifications)}>
-                🔔 {notifications.length > 0 && <span className="notification-badge">{notifications.length}</span>}
+              <div
+                className="notification-icon"
+                onClick={() => setShowNotifications(!showNotifications)}
+              >
+                🔔{" "}
+                {notifications.length > 0 && (
+                  <span className="notification-badge">
+                    {notifications.length}
+                  </span>
+                )}
               </div>
-
-              {/* Notification Dropdown */}
               {showNotifications && (
                 <div className="notification-dropdown">
                   {notifications.length > 0 ? (
-                    notifications.map((note, index) => (
-                      <div key={index} className="notification-item">{note}</div>
+                    notifications.map((note, i) => (
+                      <div key={i} className="notification-item">
+                        {note}
+                      </div>
                     ))
                   ) : (
-                    <p className="no-notifications">No new notifications</p>
+                    <p>No notifications</p>
                   )}
-                  <button className="clear-btn" onClick={clearNotifications}>Clear All</button>
+                  <button className="clear-btn" onClick={clearNotifications}>
+                    Clear All
+                  </button>
                 </div>
               )}
             </div>
-
-            {/* Profile image with dropdown options */}
             <div className="profile-container">
               <img
                 src={avatarURL}
@@ -318,20 +335,8 @@ const TaskManagement = () => {
               />
               {showProfileOptions && (
                 <div className="profile-dropdown">
-                  {!showProfile ? (
+                  {userDetails ? (
                     <>
-                      <button
-                        className="profile-option"
-                        onClick={() => setShowProfile(true)}
-                      >
-                        <FaUser  /> Profile
-                      </button>
-                      <button className="profile-option" onClick={handleLogout}>
-                        <FaSignOutAlt /> Logout
-                      </button>
-                    </>
-                  ) : (
-                    <div className="profile-card">
                       <img
                         src={avatarURL}
                         alt="Profile Pic"
@@ -343,17 +348,18 @@ const TaskManagement = () => {
                       <p>{userDetails.location}</p>
                       <p>{userDetails.socialLinks}</p>
                       <button
-                        className="update-btn"
+                        className="profile-option"
                         onClick={() => setShowUpdateProfile(true)}
                       >
                         Update Profile
                       </button>
-                      <button
-                        className="back-btn"
-                        onClick={() => setShowProfile(false)}
-                      >
-                        Back
+                      <button className="profile-option" onClick={handleLogout}>
+                        <FaSignOutAlt /> Logout
                       </button>
+                    </>
+                  ) : (
+                    <div className="profile-card">
+                      <p>Loading profile...</p>
                     </div>
                   )}
                 </div>
@@ -362,14 +368,12 @@ const TaskManagement = () => {
           </div>
         </header>
 
-        {/* Add Task Button */}
         {activeSection === "all" && (
           <button className="add-task-btn" onClick={() => setShowForm(true)}>
-            +{" "}
+            +
           </button>
         )}
 
-        {/* Task Form Popup */}
         {showForm && (
           <div className="task-form-popup">
             <input
@@ -409,7 +413,6 @@ const TaskManagement = () => {
           </div>
         )}
 
-        {/* Render UpdateProfile component */}
         {showUpdateProfile && (
           <UpdateProfile
             onClose={() => setShowUpdateProfile(false)}
@@ -418,36 +421,74 @@ const TaskManagement = () => {
           />
         )}
 
-        {/* Display Tasks */}
         <div className="TASK_GRID">
           {tasks
-            .filter(task =>
-              (activeSection === "all" || task.status === activeSection) &&
-              task.title.toLowerCase().includes(searchQuery.toLowerCase())
+            .filter(
+              (task) =>
+                (activeSection === "all" || task.status === activeSection) &&
+                task.title.toLowerCase().includes(searchQuery.toLowerCase())
             )
             .map((task) => (
-              <div key={task.id} className="TASK_CARD">
-                {editingTaskId === task.id ? (
+              <div key={task._id} className="TASK_CARD">
+                {editingTaskId === task._id ? (
                   <>
-                    <input type="text" name="title" value={editedTask.title} onChange={handleEditChange} />
-                    <textarea name="description" value={editedTask.description} onChange={handleEditChange} />
-                    <input type="date" name="startDate" value={editedTask.startDate} onChange={handleEditChange} />
-                    <input type="date" name="endDate" value={editedTask.endDate} onChange={handleEditChange} />
+                    <input
+                      type="text"
+                      name="title"
+                      value={editedTask.title}
+                      onChange={handleEditChange}
+                    />
+                    <textarea
+                      name="description"
+                      value={editedTask.description}
+                      onChange={handleEditChange}
+                    />
+                    <input
+                      type="date"
+                      name="startDate"
+                      value={editedTask.startDate}
+                      onChange={handleEditChange}
+                    />
+                    <input
+                      type="date"
+                      name="endDate"
+                      value={editedTask.endDate}
+                      onChange={handleEditChange}
+                    />
                     <div className="TASK_ACTIONS">
-                      <FaSave className="SAVE_ICON" onClick={() => saveEdit(task.id)} />
-                      <button className="CANCEL_EDIT_BTN" onClick={() => setEditingTaskId(null)}>Cancel Edit</button>
+                      <FaSave
+                        className="SAVE_ICON"
+                        onClick={() => saveEdit(task._id)}
+                      />
+                      <button
+                        className="CANCEL_EDIT_BTN"
+                        onClick={() => setEditingTaskId(null)}
+                      >
+                        Cancel Edit
+                      </button>
                     </div>
                   </>
                 ) : (
                   <>
                     <h3>Title: {task.title}</h3>
                     <p>Description: {task.description}</p>
-                    <p className="TASK_DATE">Start: {task.startDate} | End: {task.endDate}</p>
+                    <p className="TASK_DATE">
+                      Start: {task.startDate} | End: {task.endDate}
+                    </p>
                     <div className="TASK_ACTIONS">
-                      <FaEdit className="EDIT_ICON" onClick={() => startEditing(task)} />
-                      <FaTrash className="DELETE_ICON" onClick={() => deleteTask(task.id)} />
+                      <FaEdit
+                        className="EDIT_ICON"
+                        onClick={() => startEditing(task)}
+                      />
+                      <FaTrash
+                        className="DELETE_ICON"
+                        onClick={() => deleteTask(task._id)}
+                      />
                       {task.status !== "completed" && (
-                        <button className="COMPLETE_BTN" onClick={() => completeTask(task.id)}>
+                        <button
+                          className="COMPLETE_BTN"
+                          onClick={() => completeTask(task._id)}
+                        >
                           <FaCheck className="COMPLETE_ICON" /> Complete
                         </button>
                       )}

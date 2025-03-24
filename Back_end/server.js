@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
 import authRoutes from "./routes/loginauth.js";
+import taskRoutes from "./routes/taskRoutes.js";
 import { verifyToken, authorizeRoles } from "./middleware/authmiddleware.js";
 
 dotenv.config();
@@ -22,12 +23,13 @@ const PORT = process.env.PORT || 5000;
 
 // Sample Public Route
 app.get("/", (req, res) => {
-    res.send("Todo Backend Running");
+    res.send("Zidio Task Management Backend is Running");
 });
 
 // Authentication Routes
 app.use("/auth", authRoutes);
 
-
+// task routes
+app.use('/api/tasks', taskRoutes);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
