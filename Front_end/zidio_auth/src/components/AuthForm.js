@@ -1,8 +1,9 @@
 // Importing necessary modules and styles
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./AuthForm.css"; // Import external CSS for styling
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // Import icons for better UI
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContextProvider";
 
 // Authentication Form Component
 const AuthForm = () => {
@@ -18,6 +19,7 @@ const AuthForm = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [error, setError] = useState(""); // New: Error handling state
+  const{user, setUser} = useContext(AuthContext);
 
   const navigate = useNavigate(); // Initialize navigate function
 
@@ -74,6 +76,7 @@ const AuthForm = () => {
   
       const data = await response.json();
       if (response.ok) {
+        setUser(data.user)
         localStorage.setItem("token", data.token);
         localStorage.setItem("userRole", data.user.role);
         setPopupMessage(isSignUp ? "✅ Account Created Successfully!" : "🚀 Welcome back!");

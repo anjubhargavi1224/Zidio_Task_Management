@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import md5 from "blueimp-md5"; // Import MD5 for hashing emails
 import {
   FaSearch,
@@ -13,6 +13,7 @@ import "./TaskManagement.css";
 import { RadialBarChart, RadialBar, Tooltip } from "recharts";
 import { useNavigate } from "react-router-dom";
 import UpdateProfile from './UpdateProfile'; // Import the UpdateProfile component
+import { AuthContext } from "../context/AuthContextProvider";
 
 // Function to generate Gravatar image URL based on the hashed email
 const getGravatarURL = (email) => {
@@ -34,6 +35,7 @@ const TaskManagement = () => {
   const [newNotifications, setNewNotifications] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const{user, setUser} = useContext(AuthContext);
 
   // User details state
   const [userDetails, setUserDetails] = useState(() => {
@@ -306,11 +308,11 @@ const TaskManagement = () => {
                       alt="Profile Pic"
                       className="profile-image"
                     />
-                    <p>{userDetails.fullName}</p>
-                    <p>{userDetails.email}</p>
-                    <p>{userDetails.occupation}</p>
-                    <p>{userDetails.location}</p>
-                    <p>{userDetails.socialLinks}</p>
+                   <p>{user.username}</p>
+                    <p>{user.role}</p>
+                    <p>{user.email}</p>
+                    <p>{user.occupation}</p>
+                    <p>{user.location}</p>
                     <button
                       className="update-btn"
                       onClick={() => setShowUpdateProfile(true)}
