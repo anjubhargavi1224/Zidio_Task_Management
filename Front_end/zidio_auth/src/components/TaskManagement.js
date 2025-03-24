@@ -82,37 +82,11 @@ const TaskManagement = () => {
     setNewNotifications(savedNotifications.length);
   }, [userDetails.email]);
 
+  // Handle input changes for adding a new task
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    const today = new Date().toISOString().split("T")[0];
-  
-    setNewTask((prevTask) => {
-      if (name === "startDate") {
-        if (value < today) {
-          alert("Start Date cannot be in the past!");
-          return prevTask;
-        }
-        // Reset end date if it is before new start date
-        if (prevTask.endDate && value > prevTask.endDate) {
-          return { ...prevTask, startDate: value, endDate: "" };
-        }
-      }
-  
-      if (name === "endDate") {
-        if (!prevTask.startDate) {
-          alert("Please select a Start Date first!");
-          return prevTask;
-        }
-        if (value < prevTask.startDate) {
-          alert("End Date cannot be before the Start Date!");
-          return prevTask;
-        }
-      }
-  
-      return { ...prevTask, [name]: value };
-    });
+    setNewTask({ ...newTask, [name]: value });
   };
-  
 
   // Add a new task to the task list
   const addTask = () => {
@@ -308,16 +282,14 @@ const TaskManagement = () => {
                       alt="Profile Pic"
                       className="profile-image"
                     />
-                   <p>{user.username}</p>
+                    
+                    <p>{user.username}</p>
                     <p>{user.role}</p>
                     <p>{user.email}</p>
                     <p>{user.occupation}</p>
                     <p>{user.location}</p>
-<<<<<<< HEAD
                     
                 
-=======
->>>>>>> a5f0eba2180c3b0875467af3d49a6781a97e6d72
                     <button
                       className="update-btn"
                       onClick={() => setShowUpdateProfile(true)}
@@ -366,7 +338,7 @@ const TaskManagement = () => {
         </button>
 
         {/* RadialBarChart */}
-        <div className="CHART-CONTAINER">
+        <div className="chart-container">
           <RadialBarChart
             width={150}
             height={150}
