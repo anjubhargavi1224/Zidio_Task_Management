@@ -30,7 +30,6 @@ const TaskManagement = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const{user, setUser} = useContext(AuthContext);
 
-<<<<<<< HEAD
   // user details
   const [userDetails, setUserDetails] = useState(null);
   const [avatarURL, setAvatarURL] = useState(getGravatarURL("fallback@example.com"));
@@ -41,51 +40,6 @@ const TaskManagement = () => {
   }, [userDetails?.email])
 
 // task fields
-=======
-  // User details state
-  const [userDetails, setUserDetails] = useState(() => {
-    const savedUserDetails = localStorage.getItem("userDetails");
-    return savedUserDetails ? JSON.parse(savedUserDetails) : {
-      fullName: "Name",
-      email: "example@gmail.com",
-      occupation: "Developer",
-      location: "City",
-      socialLinks: "LinkedIn, Twitter",
-      profilePic: getGravatarURL("tejas@example.com"),
-    };
-  });
-
-  const avatarURL = userDetails.profilePic;
-
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            const response = await fetch(`http://localhost:5000/auth/users`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            const users = await response.json();
-            const loggedInUser = users.find((u) => u.email === user.email);
-            console.log(user);
-
-            if (loggedInUser) {
-                setUserDetails(loggedInUser);
-                localStorage.setItem("userDetails", JSON.stringify(loggedInUser));
-            }
-        } catch (error) {
-            console.error("Error fetching user details:", error);
-        }
-    };
-
-    fetchUserDetails();
-}, []);
-
-
-
-
-  // State for handling new task input fields
->>>>>>> 872678f7053ebfab1436d7cb1c96d3b62329cc9d
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
@@ -277,8 +231,6 @@ const TaskManagement = () => {
 
   return (
     <div className="task-container">
-<<<<<<< HEAD
-=======
 
       <header className="top-header">
         <h2>Task Management</h2>
@@ -374,7 +326,6 @@ const TaskManagement = () => {
           </div>
         </div>
       </header>
->>>>>>> 872678f7053ebfab1436d7cb1c96d3b62329cc9d
       {/* Sidebar with task filters */}
       <aside className="sidebar">
         <div className="user-greeting">
