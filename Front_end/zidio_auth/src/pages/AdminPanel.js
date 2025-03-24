@@ -6,7 +6,6 @@ import {
   FaEdit,
   FaSave,
   FaTrash,
-  FaCheck,
   FaPlus,
 } from "react-icons/fa";
 import { BarChart, Bar, XAxis, Tooltip, Legend } from "recharts";
@@ -119,6 +118,13 @@ const AdminPanel = () => {
     }
   }, [navigate]); // Run on component mount
 
+  const handleDeleteUser = (userId) => {
+    const isConfirmed = window.confirm("Are you sure you want to delete this user?");
+    if (isConfirmed) {
+      setUsers(users.filter((user) => user._id !== userId));
+    }
+  };
+
   return (
     <div className="admin-container">
       {/* Sidebar */}
@@ -191,8 +197,7 @@ const AdminPanel = () => {
                     <td>{user.username}</td>
                     <td>{user.email}</td>
                     <td>
-                      <button>Edit</button>
-                      <button>Delete</button>
+                      <button onClick={() => handleDeleteUser(user._id)}>Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -248,10 +253,35 @@ const AllTasks = ({
     status: "",
   });
 
-  // Handle form input changes
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setNewTask({ ...newTask, [name]: value });
+    const today = new Date().toISOString().split("T")[0];
+
+    setNewTask((prevTask) => {
+      if (name === "startDate") {
+        if (value < today) {
+          alert("Start Date cannot be in the past!");
+          return prevTask;
+        }
+        // Reset end date if it is before new start date
+        if (prevTask.endDate && value > prevTask.endDate) {
+          return { ...prevTask, startDate: value, endDate: "" };
+        }
+      }
+
+      if (name === "endDate") {
+        if (!prevTask.startDate) {
+          alert("Please select a Start Date first!");
+          return prevTask;
+        }
+        if (value < prevTask.startDate) {
+          alert("End Date cannot be before the Start Date!");
+          return prevTask;
+        }
+      }
+
+      return { ...prevTask, [name]: value };
+    });
   };
 
   // Add new task
@@ -308,15 +338,6 @@ const AllTasks = ({
       )
     );
     setEditingTaskId(null);
-  };
-
-  // Mark task as complete
-  const completeTask = (taskId) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, status: "completed" } : task
-      )
-    );
   };
 
   return (
@@ -390,28 +411,58 @@ const AllTasks = ({
             onChange={handleFormChange}
           />
 
-          {/* Assign To Dropdown */}
-          <label htmlFor="assignedTo">Assign To:</label>
-          <select
-            id="assignedTo"
-            name="assignedTo"
-            value={newTask.assignedTo}
-            onChange={handleFormChange}
-            required
-          >
-            <option value="" disabled>
-              Select a user
-            </option>
-            {users.length > 0 ? (
-              users.map((user) => (
-                <option key={user.id} value={user.username}>
-                  {user.username}
-                </option>
-              ))
-            ) : (
-              <option disabled>No users available</option>
-            )}
-          </select>
+          {/* Assign To Multi-Select Checkboxes */}
+          <label>Assign To:</label>
+          <div className="assign-to-container">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setNewTask((prevTask) => ({
+                      ...prevTask,
+                      assignedTo: users.map((user) => user.username), // Select all users
+                    }));
+                  } else {
+                    setNewTask((prevTask) => ({
+                      ...prevTask,
+                      assignedTo: [], // Deselect all users
+                    }));
+                  }
+                }}
+                checked={newTask.assignedTo.length === users.length} // Check if all are selected
+              />
+              Select All
+            </label>
+
+            <div className="assign-to-checkboxes">
+              {users.length > 0 ? (
+                users.map((user) => (
+                  <label key={user.id} className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="assignedTo"
+                      value={user.username}
+                      checked={newTask.assignedTo.includes(user.username)}
+                      onChange={(e) => {
+                        const { value, checked } = e.target;
+                        setNewTask((prevTask) => ({
+                          ...prevTask,
+                          assignedTo: checked
+                            ? [...prevTask.assignedTo, value]
+                            : prevTask.assignedTo.filter((user) => user !== value),
+                        }));
+                      }}
+                    />
+                    {user.username}
+                  </label>
+                ))
+              ) : (
+                <p>No users available</p>
+              )}
+            </div>
+          </div>
+
 
           <div className="TASK_FORM_BUTTONS">
             <button
@@ -476,7 +527,8 @@ const AllTasks = ({
                 <>
                   <h3>Title: {task.title}</h3>
                   <p>Description: {task.description}</p>
-                  <p>Assigned To: {task.assignedTo}</p>
+                  <p>Assigned To: {Array.isArray(task.assignedTo) ? task.assignedTo.join(", ") : "Not Assigned"}</p>
+
                   <p className="TASK_DATE">
                     Start: {task.startDate} | End: {task.endDate}
                   </p>
@@ -489,14 +541,7 @@ const AllTasks = ({
                       className="DELETE_ICON"
                       onClick={() => deleteTask(task.id)}
                     />
-                    {task.status !== "completed" && (
-                      <button
-                        className="COMPLETE_BTN"
-                        onClick={() => completeTask(task.id)}
-                      >
-                        <FaCheck className="COMPLETE_ICON" /> Complete
-                      </button>
-                    )}
+                  
                   </div>
                 </>
               )}

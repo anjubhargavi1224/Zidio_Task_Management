@@ -11,7 +11,7 @@ const AuthForm = () => {
   const [email, setEmail] = useState(""); // Stores the email input value
   const [password, setPassword] = useState(""); // Stores the password input value
   const [name, setName] = useState(""); // Stores the name input value (only for Sign Up)
-  const [role, setRole] = useState("user"); //default role : user
+  const [role] = useState("user"); //default role : user
   const [showPassword, setShowPassword] = useState(false); // Controls password visibility toggle
   const [showPopup, setShowPopup] = useState(false); // Controls popup notification visibility
   const [popupMessage, setPopupMessage] = useState(""); // Stores popup message text

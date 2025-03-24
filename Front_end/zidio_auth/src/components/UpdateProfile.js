@@ -25,7 +25,7 @@ const UpdateProfile = ({ onClose, userDetails = {}, onUpdate }) => {
                 alert("Please upload a valid image file.");
                 return;
             }
-            if (file.size > 2 * 1024 * 1024) {
+            if (file.size > 10 * 1024 * 1024) {
                 alert("File size should be less than 2MB.");
                 return;
             }
