@@ -1,21 +1,18 @@
-// TaskManagement.js
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import md5 from "blueimp-md5";
+import md5 from "blueimp-md5"; // Import MD5 for hashing emails
 import {
   FaSearch,
   FaEdit,
   FaTrash,
   FaSave,
   FaCheck,
-  // FaUser,
+  FaUser ,
   FaSignOutAlt,
 } from "react-icons/fa";
 import "./TaskManagement.css";
 import { RadialBarChart, RadialBar, Tooltip } from "recharts";
-import { useNavigate } from "react-router-dom";
-import UpdateProfile from "./UpdateProfile";
-
+import { useNavigate } from "react-router-dom"; 
+import UpdateProfile from './UpdateProfile'; // Import the UpdateProfile component
 
 const getGravatarURL = (email) => {
   const hash = md5(email.trim().toLowerCase());
@@ -31,6 +28,7 @@ const TaskManagement = () => {
   const [showUpdateProfile, setShowUpdateProfile] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const{user, setUser} = useContext(AuthContext);
 
   // user details
   const [userDetails, setUserDetails] = useState(null);
@@ -215,23 +213,25 @@ const TaskManagement = () => {
 
   // logout option from profile
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userRole");
-    navigate("/");
+    localStorage.removeItem("token"); // Remove stored JWT token
+    localStorage.removeItem("userRole"); // Remove role if stored
+
+    // Redirect to login page and clear history to prevent going back
+    window.location.replace("/"); 
   };
 
-  // task complete and inprogress functionality
-  const completedCount = tasks.filter((t) => t.status === "completed").length;
-  const pendingCount = tasks.filter((t) => t.status !== "completed").length;
+  const navigate = useNavigate(); // React Router navigation
 
-  const chartData = [
-    { name: "Completed", value: completedCount, fill: "#34D399" },
-    { name: "Pending", value: pendingCount, fill: "#EF4444" },
-  ];
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/"); // Redirect to login if not authenticated
+    }
+  }, [navigate]); // Run on component mount
 
-  // task management full interface
   return (
     <div className="task-container">
+      {/* Sidebar with task filters */}
       <aside className="sidebar">
         <div className="user-greeting">
           <h3>Hello, Welcome</h3>
@@ -286,6 +286,8 @@ const TaskManagement = () => {
       <div className="main-content">
         <header className="top-header">
           <h2>Task Management</h2>
+
+          {/* Search bar */}
           <div className="search-box">
             <FaSearch className="search-icon" />
             <input
@@ -296,36 +298,30 @@ const TaskManagement = () => {
             />
           </div>
 
+          {/* Profile and notification section */}
           <div className="profile-section">
             <div className="notification-container">
-              <div
-                className="notification-icon"
-                onClick={() => setShowNotifications(!showNotifications)}
-              >
-                🔔{" "}
-                {notifications.length > 0 && (
-                  <span className="notification-badge">
-                    {notifications.length}
-                  </span>
-                )}
+              {/* Notification Bell Icon */}
+              <div className="notification-icon" onClick={() => setShowNotifications(!showNotifications)}>
+                🔔 {notifications.length > 0 && <span className="notification-badge">{notifications.length}</span>}
               </div>
+
+              {/* Notification Dropdown */}
               {showNotifications && (
                 <div className="notification-dropdown">
                   {notifications.length > 0 ? (
-                    notifications.map((note, i) => (
-                      <div key={i} className="notification-item">
-                        {note}
-                      </div>
+                    notifications.map((note, index) => (
+                      <div key={index} className="notification-item">{note}</div>
                     ))
                   ) : (
-                    <p>No notifications</p>
+                    <p className="no-notifications">No new notifications</p>
                   )}
-                  <button className="clear-btn" onClick={clearNotifications}>
-                    Clear All
-                  </button>
+                  <button className="clear-btn" onClick={clearNotifications}>Clear All</button>
                 </div>
               )}
             </div>
+
+            {/* Profile image with dropdown options */}
             <div className="profile-container">
               <img
                 src={avatarURL}
@@ -335,8 +331,20 @@ const TaskManagement = () => {
               />
               {showProfileOptions && (
                 <div className="profile-dropdown">
-                  {userDetails ? (
+                  {!showProfile ? (
                     <>
+                      <button
+                        className="profile-option"
+                        onClick={() => setShowProfile(true)}
+                      >
+                        <FaUser  /> Profile
+                      </button>
+                      <button className="profile-option" onClick={handleLogout}>
+                        <FaSignOutAlt /> Logout
+                      </button>
+                    </>
+                  ) : (
+                    <div className="profile-card">
                       <img
                         src={avatarURL}
                         alt="Profile Pic"
@@ -348,18 +356,17 @@ const TaskManagement = () => {
                       <p>{userDetails.location}</p>
                       <p>{userDetails.socialLinks}</p>
                       <button
-                        className="profile-option"
+                        className="update-btn"
                         onClick={() => setShowUpdateProfile(true)}
                       >
                         Update Profile
                       </button>
-                      <button className="profile-option" onClick={handleLogout}>
-                        <FaSignOutAlt /> Logout
+                      <button
+                        className="back-btn"
+                        onClick={() => setShowProfile(false)}
+                      >
+                        Back
                       </button>
-                    </>
-                  ) : (
-                    <div className="profile-card">
-                      <p>Loading profile...</p>
                     </div>
                   )}
                 </div>
@@ -421,6 +428,7 @@ const TaskManagement = () => {
           />
         )}
 
+        {/* Display Tasks */}
         <div className="TASK_GRID">
           {tasks
             .filter(
@@ -429,66 +437,28 @@ const TaskManagement = () => {
                 task.title.toLowerCase().includes(searchQuery.toLowerCase())
             )
             .map((task) => (
-              <div key={task._id} className="TASK_CARD">
-                {editingTaskId === task._id ? (
+              <div key={task.id} className="TASK_CARD">
+                {editingTaskId === task.id ? (
                   <>
-                    <input
-                      type="text"
-                      name="title"
-                      value={editedTask.title}
-                      onChange={handleEditChange}
-                    />
-                    <textarea
-                      name="description"
-                      value={editedTask.description}
-                      onChange={handleEditChange}
-                    />
-                    <input
-                      type="date"
-                      name="startDate"
-                      value={editedTask.startDate}
-                      onChange={handleEditChange}
-                    />
-                    <input
-                      type="date"
-                      name="endDate"
-                      value={editedTask.endDate}
-                      onChange={handleEditChange}
-                    />
+                    <input type="text" name="title" value={editedTask.title} onChange={handleEditChange} />
+                    <textarea name="description" value={editedTask.description} onChange={handleEditChange} />
+                    <input type="date" name="startDate" value={editedTask.startDate} onChange={handleEditChange} />
+                    <input type="date" name="endDate" value={editedTask.endDate} onChange={handleEditChange} />
                     <div className="TASK_ACTIONS">
-                      <FaSave
-                        className="SAVE_ICON"
-                        onClick={() => saveEdit(task._id)}
-                      />
-                      <button
-                        className="CANCEL_EDIT_BTN"
-                        onClick={() => setEditingTaskId(null)}
-                      >
-                        Cancel Edit
-                      </button>
+                      <FaSave className="SAVE_ICON" onClick={() => saveEdit(task.id)} />
+                      <button className="CANCEL_EDIT_BTN" onClick={() => setEditingTaskId(null)}>Cancel Edit</button>
                     </div>
                   </>
                 ) : (
                   <>
                     <h3>Title: {task.title}</h3>
                     <p>Description: {task.description}</p>
-                    <p className="TASK_DATE">
-                      Start: {task.startDate} | End: {task.endDate}
-                    </p>
+                    <p className="TASK_DATE">Start: {task.startDate} | End: {task.endDate}</p>
                     <div className="TASK_ACTIONS">
-                      <FaEdit
-                        className="EDIT_ICON"
-                        onClick={() => startEditing(task)}
-                      />
-                      <FaTrash
-                        className="DELETE_ICON"
-                        onClick={() => deleteTask(task._id)}
-                      />
+                      <FaEdit className="EDIT_ICON" onClick={() => startEditing(task)} />
+                      <FaTrash className="DELETE_ICON" onClick={() => deleteTask(task.id)} />
                       {task.status !== "completed" && (
-                        <button
-                          className="COMPLETE_BTN"
-                          onClick={() => completeTask(task._id)}
-                        >
+                        <button className="COMPLETE_BTN" onClick={() => completeTask(task.id)}>
                           <FaCheck className="COMPLETE_ICON" /> Complete
                         </button>
                       )}
@@ -498,6 +468,7 @@ const TaskManagement = () => {
               </div>
             ))}
         </div>
+
       </div>
     </div>
   );

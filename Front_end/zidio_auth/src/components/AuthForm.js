@@ -1,8 +1,9 @@
 // Importing necessary modules and styles
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./AuthForm.css"; // Import external CSS for styling
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // Import icons for better UI
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContextProvider";
 
 // Authentication Form Component
 const AuthForm = () => {
@@ -11,10 +12,14 @@ const AuthForm = () => {
   const [email, setEmail] = useState(""); // Stores the email input value
   const [password, setPassword] = useState(""); // Stores the password input value
   const [name, setName] = useState(""); // Stores the name input value (only for Sign Up)
-  const [role, setRole] = useState("user"); //default role : user
+  const [role] = useState("user"); //default role : user
   const [showPassword, setShowPassword] = useState(false); // Controls password visibility toggle
   const [showPopup, setShowPopup] = useState(false); // Controls popup notification visibility
   const [popupMessage, setPopupMessage] = useState(""); // Stores popup message text
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [error, setError] = useState(""); // New: Error handling state
+  const{user, setUser} = useContext(AuthContext);
 
   const navigate = useNavigate(); // Initialize navigate function
 
@@ -71,6 +76,7 @@ const AuthForm = () => {
   
       const data = await response.json();
       if (response.ok) {
+        setUser(data.user)
         localStorage.setItem("token", data.token);
         localStorage.setItem("userRole", data.user.role);
         setPopupMessage(isSignUp ? "✅ Account Created Successfully!" : "🚀 Welcome back!");
@@ -88,26 +94,79 @@ const AuthForm = () => {
       alert("Something went wrong. Please try again.");
     }
   };
+  console.log(user);
+
+    // Handles Forgot Password form submission
+    const handleForgotPassword = async (e) => {}
+    //   e.preventDefault();
+    //   setError("");
+  
+    //   if (!validateEmail(resetEmail)) {
+    //     setError("❌ Please enter a valid email!");
+    //     return;
+    //   }
+  
+    //   try {
+    //     const response = await fetch(`http://localhost:5000/auth/forgot-password`, {
+    //       method: "POST",
+    //       headers: { "Content-Type": "application/json" },
+    //       body: JSON.stringify({ email: resetEmail }),
+    //     });
+  
+    //     const data = await response.json();
+    //     if (!response.ok) throw new Error(data.error || "Something went wrong");
+  
+    //     setPopupMessage("📩 Password reset link sent!");
+    //     setShowPopup(true);
+  
+    //     setTimeout(() => {
+    //       setShowPopup(false);
+    //       setIsForgotPassword(false);
+    //       setResetEmail("");
+    //     }, 2000);
+    //   } catch (error) {
+    //     setError(error.message);
+    //   }
+    // };
+  
+
+  
   
 
   return (
     <div className="auth-container">
-      {/* Left Side Content with Branding */}
-      <div className="auth-left">
-        <h2 className="auth-title">
-          Zidio Task <br />
-          Management
-        </h2>
-        <div className="auth-tagline">Manage all your tasks in one place</div>
-      </div>
+    {/* Left Branding Section */}
+    <div className="auth-left">
+      <h2 className="auth-title">Zidio Task <br /> Management</h2>
+      <div className="auth-tagline">Manage all your tasks in one place</div>
+    </div>
 
-      {/* Right Side Authentication Box */}
-      <div className="auth-box">
-        <h2>{isSignUp ? "Sign Up" : "Login"}</h2>
+    {/* Right Auth Box */}
+    <div className="auth-box">
+      <h2>{isSignUp ? "Sign Up" : "Login"}</h2>
 
-        {/* Authentication Form */}
+      {/* Show Error Messages */}
+      {error && <div className="error-message">{error}</div>}
+
+      {/* Authentication Form */}
+      {isForgotPassword ? (
+        <form onSubmit={handleForgotPassword}>
+          <div className="input-group">
+            <FaEnvelope className="icon" />
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="submit-btn">Send Reset Link</button>
+          <p className="switch-mode" onClick={() => setIsForgotPassword(false)}>Back to Login</p>
+        </form>
+      ) : (
         <form onSubmit={handleSubmit}>
-          {/* Name Field (Only for Sign Up) */}
+          {/* Name Input (SignUp Only) */}
           {isSignUp && (
             <div className="input-group">
               <FaUser className="icon" />
@@ -121,7 +180,7 @@ const AuthForm = () => {
             </div>
           )}
 
-          {/* Email Field */}
+          {/* Email Input */}
           <div className="input-group">
             <FaEnvelope className="icon" />
             <input
@@ -133,7 +192,7 @@ const AuthForm = () => {
             />
           </div>
 
-          {/* Password Field with Toggle Visibility */}
+          {/* Password Input */}
           <div className="input-group">
             <FaLock className="icon" />
             <input
@@ -144,52 +203,27 @@ const AuthForm = () => {
               required
               minLength="6"
             />
-            {/* Toggle password visibility button */}
-            <span
-              className="toggle-password"
-              onClick={() => setShowPassword(!showPassword)}
-            >
+            <span className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
 
-          {/* Role Selection Dropdown */}
-            {/* <div className="input-group">
-              <label className="role-label">{isSignUp ? " Register as:" : "Login as:"}</label>
-              <select value={role} onChange={(e) => setRole(e.target.value)}>
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div> */}
+          {/* Forgot Password */}
+          {!isSignUp && <p className="forgot-password" onClick={() => setIsForgotPassword(true)}>Forgot Password?</p>}
 
-
-          {/* Forgot Password Link (Only for Sign In Mode) */}
-          {!isSignUp && (
-            <p className="forgot-password">
-              Lost password? <span>Click Here!</span>
-            </p>
-          )}
-
-          {/* Submit Button */}
-          <button type="submit" className="submit-btn">
-            {isSignUp ? "Sign Up" : "Login"}
-          </button>
+          <button type="submit" className="submit-btn">{isSignUp ? "Sign Up" : "Login"}</button>
         </form>
-
-        {/* Switch Between Sign In and Sign Up */}
-        <p className="switch-mode" onClick={toggleMode}>
-          {isSignUp ? "Already have an account? Login" : "New user? Sign Up"}
-        </p>
-      </div>
-
-      {/* Popup Notification for Feedback Messages */}
-      {showPopup && (
-        <div className="popup">
-          <p>{popupMessage}</p>
-        </div>
       )}
+
+      {/* Mode Switch */}
+      <p className="switch-mode" onClick={toggleMode}>{isSignUp ? "Already have an account? Login" : "New user? Sign Up"}</p>
     </div>
-  );
+
+    {/* Popup Notification */}
+    {showPopup && <div className="popup"><p>{popupMessage}</p></div>}
+  </div>
+);
 };
+
 
 export default AuthForm; // Exporting the AuthForm component

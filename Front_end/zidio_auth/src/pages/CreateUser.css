@@ -1,25 +1,59 @@
 .create-user-form {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    margin-top: 10px;
-  }
-  
-  .create-user-form h2 {
-    margin-bottom: 10px;
-  }
-  
-  .create-user-form input {
-    width: 90%;
-    padding: 10px;
-    margin-left: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .create-user-form button {
-    margin-right: 10px;
-  }
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 10px 0 20px;
+  width: 100%;
+  max-width: 97%; /* Prevents form from stretching too wide */
+}
+
+.create-user-form h2 {
+  margin-bottom: 15px;
+  text-align: center;
+  color: #333;
+}
+
+.create-user-form div {
+  margin-bottom: 10px;
+}
+
+.create-user-form label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.create-user-form input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.create-user-form button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.create-user-form button[type="submit"] {
+  background-color: #007bff;
+  color: white;
+}
+
+.create-user-form button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+.create-user-form button[type="button"] {
+  background-color: #ccc;
+  color: black;
+}
+
+.create-user-form button[type="button"]:hover {
+  background-color: #999;
+}

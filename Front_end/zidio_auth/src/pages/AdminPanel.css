@@ -62,6 +62,7 @@
 .logout{
   color: #c82333;
   margin-top: 110px;
+  cursor: pointer;
 }
 
 /* Main Content Area */
@@ -314,6 +315,48 @@ button:hover {
   }
 }
 
+.assign-to-container {
+  border: 1px solid #ccc;
+  padding: 10px;
+  max-width: 300px;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.assign-to-checkboxes {
+  max-height: 150px; /* Scrollable when too many users */
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.select-all-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 5px;
+}
+
+
 
 .task-filters {
   width: 160px; /* Equivalent to w-40 */
@@ -354,36 +397,38 @@ button:hover {
 
 /* Individual button colors */
 .all {
-  background-color: #3b82f6; /* bg-blue-500 */
+  background-color: #71a4f6; /* bg-blue-500 */
 }
 
 .completed {
-  background-color: #10b981; /* bg-green-500 */
+  background-color: #69e7bd; /* bg-green-500 */
 }
 
 .pending {
-  background-color: #ef4444; /* bg-red-500 */
+  background-color: #ef7e7e; /* bg-red-500 */
 }
 
 /* Hover effects */
 .all:hover {
-  background-color: #2563eb; /* hover:bg-blue-600 */
+  background-color: #07318c; /* hover:bg-blue-600 */
 }
 
 .completed:hover {
-  background-color: #059669; /* hover:bg-green-600 */
+  background-color: #045e41; /* hover:bg-green-600 */
 }
 
 .pending:hover {
-  background-color: #dc2626; /* hover:bg-red-600 */
+  background-color: #850707; /* hover:bg-red-600 */
 }
 
 /* Active state */
 .active {
   filter: brightness(90%);
+  border: 2px solid black;
+  font-weight: bolder;
 }
 
-  /*Tak Filters*/
+  /*Task Filters*/
   .task-filters-admin {
     margin: 10px 0; /* Add some margin for spacing */
     display: flex;
@@ -415,4 +460,86 @@ button:hover {
   #userFilter{
     background-color: #D3D3D3;
   }
+@media (min-width:900px) and (max-width: 940px){
+  .admin-container{
+    width: 100vw;
+    height: 100vh;
+  }
+  .admin-content{
+    width: 100vw;
+    height: 100vh;
+  }
+}
 
+@media (min-width:770px) and (max-width: 899px) {
+  .admin-container{
+   width: 100vw;
+   height: 100vh;
+  }
+  .admin-content{
+    padding: 15px;
+  }
+  .TASK_GRID{
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+}
+
+@media (min-width:400px) and (max-width: 600px){
+  .admin-sidebar{
+    width: 180px;
+    gap: 120px;
+  }
+  .chart-container{
+    width: 180px;
+  }
+  .custom-legend{
+    font-size: 11px;
+  }
+  .admin-sidebar li{
+    font-size: 17px;
+  }
+  .admin-sidebar span{
+    font-size: 17px;
+  }
+  .admin-sidebar h2{
+    font-size: 25px;
+  }
+  .admin-header h1{
+    font-size: 24px;
+  }
+  .admin-container{
+    width: 100vw;
+    height: 100vh;
+   }
+   .admin-content{
+    padding: 20px;
+  }
+  .TASK_GRID{
+    display: flex;
+    flex-direction: column;
+  }
+  .TASK_CARD{
+    width: 130px;
+  }
+  .task-filters-admin{
+    gap: 10px;
+    flex-direction: column;
+  }
+  }
+  @media (min-width:600px) and (max-width: 770px){
+    .admin-container{
+      width: 100vw;
+      height: 100vh;
+     }
+     .admin-content{
+      padding: 20px;
+    }
+    .TASK_GRID{
+      grid-template-columns: repeat(1, 1fr);
+    }
+    .task-filters-admin{
+      gap: 10px;
+      flex-direction: column;
+    }
+    }
