@@ -1,8 +1,9 @@
 // Importing necessary modules and styles
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./AuthForm.css"; // Import external CSS for styling
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // Import icons for better UI
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContextProvider";
 
 // Authentication Form Component
 const AuthForm = () => {
@@ -18,6 +19,7 @@ const AuthForm = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [error, setError] = useState(""); // New: Error handling state
+  const{user, setUser} = useContext(AuthContext);
 
   const navigate = useNavigate(); // Initialize navigate function
 
@@ -74,6 +76,7 @@ const AuthForm = () => {
   
       const data = await response.json();
       if (response.ok) {
+        setUser(data.user)
         localStorage.setItem("token", data.token);
         localStorage.setItem("userRole", data.user.role);
         setPopupMessage(isSignUp ? "✅ Account Created Successfully!" : "🚀 Welcome back!");
@@ -91,39 +94,40 @@ const AuthForm = () => {
       alert("Something went wrong. Please try again.");
     }
   };
+  console.log(user);
 
     // Handles Forgot Password form submission
-    const handleForgotPassword = async (e) => {
-      e.preventDefault();
-      setError("");
+    const handleForgotPassword = async (e) => {}
+    //   e.preventDefault();
+    //   setError("");
   
-      if (!validateEmail(resetEmail)) {
-        setError("❌ Please enter a valid email!");
-        return;
-      }
+    //   if (!validateEmail(resetEmail)) {
+    //     setError("❌ Please enter a valid email!");
+    //     return;
+    //   }
   
-      try {
-        const response = await fetch(`http://localhost:5000/auth/forgot-password`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: resetEmail }),
-        });
+    //   try {
+    //     const response = await fetch(`http://localhost:5000/auth/forgot-password`, {
+    //       method: "POST",
+    //       headers: { "Content-Type": "application/json" },
+    //       body: JSON.stringify({ email: resetEmail }),
+    //     });
   
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Something went wrong");
+    //     const data = await response.json();
+    //     if (!response.ok) throw new Error(data.error || "Something went wrong");
   
-        setPopupMessage("📩 Password reset link sent!");
-        setShowPopup(true);
+    //     setPopupMessage("📩 Password reset link sent!");
+    //     setShowPopup(true);
   
-        setTimeout(() => {
-          setShowPopup(false);
-          setIsForgotPassword(false);
-          setResetEmail("");
-        }, 2000);
-      } catch (error) {
-        setError(error.message);
-      }
-    };
+    //     setTimeout(() => {
+    //       setShowPopup(false);
+    //       setIsForgotPassword(false);
+    //       setResetEmail("");
+    //     }, 2000);
+    //   } catch (error) {
+    //     setError(error.message);
+    //   }
+    // };
   
 
   

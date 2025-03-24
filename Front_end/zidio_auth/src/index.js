@@ -4,15 +4,18 @@ import ReactDOM from 'react-dom/client'; // Importing ReactDOM for rendering the
 import './index.css'; // Importing global CSS styles
 import App from './App'; // Importing the main App component
 import reportWebVitals from './reportWebVitals'; // Importing performance measurement function
+import AuthContextProvider from './context/AuthContextProvider'; // Importing the AuthContextProvider component
 
 // Creating a root element to render the React application
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
+  <AuthContextProvider>
   <React.StrictMode>
     {/* Rendering the App component inside StrictMode for highlighting potential issues */}
     <App />
   </React.StrictMode>
+  </AuthContextProvider>
 );
 
 // Performance Monitoring (Optional)
