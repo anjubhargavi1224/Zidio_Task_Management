@@ -41,8 +41,8 @@ const TaskManagement = () => {
   const [userDetails, setUserDetails] = useState(() => {
     const savedUserDetails = localStorage.getItem("userDetails");
     return savedUserDetails ? JSON.parse(savedUserDetails) : {
-      fullName: "Tejas",
-      email: "tejas@example.com",
+      fullName: "Name",
+      email: "example@gmail.com",
       occupation: "Developer",
       location: "City",
       socialLinks: "LinkedIn, Twitter",
@@ -51,6 +51,33 @@ const TaskManagement = () => {
   });
 
   const avatarURL = userDetails.profilePic;
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`http://localhost:5000/auth/users`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const users = await response.json();
+            const loggedInUser = users.find((u) => u.email === user.email);
+            console.log(user);
+
+            if (loggedInUser) {
+                setUserDetails(loggedInUser);
+                localStorage.setItem("userDetails", JSON.stringify(loggedInUser));
+            }
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+        }
+    };
+
+    fetchUserDetails();
+}, []);
+
+
+
 
   // State for handling new task input fields
   const [newTask, setNewTask] = useState({
@@ -283,11 +310,12 @@ const TaskManagement = () => {
                       className="profile-image"
                     />
                     
-                    <p>{user.username}</p>
-                    <p>{user.role}</p>
-                    <p>{user.email}</p>
-                    <p>{user.occupation}</p>
-                    <p>{user.location}</p>
+                    <p>{user?.username}</p>
+                    <p>{user?.role}</p>
+                    <p>{user?.email}</p>
+                    <p>{user?.occupation}</p>
+                    <p>{user?.location}</p>
+                    <p>{user?.socialLinks}</p>
                     
                 
                     <button

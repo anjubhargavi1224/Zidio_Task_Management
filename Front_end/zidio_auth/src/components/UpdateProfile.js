@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './UpdateProfile.css'; // Import the CSS file for styling
+import { AuthContext } from '../context/AuthContextProvider';
 
 const UpdateProfile = ({ onClose, userDetails = {}, onUpdate }) => {
     const [fullName, setFullName] = useState(userDetails?.fullName || "");
@@ -9,14 +10,49 @@ const UpdateProfile = ({ onClose, userDetails = {}, onUpdate }) => {
     const [socialLinks, setSocialLinks] = useState(userDetails?.socialLinks || "");
     const [profilePic, setProfilePic] = useState(userDetails?.profilePic || "");
 
-    const handleUpdate = () => {
-        if (!fullName || !email || !occupation || !location) {
-            alert("Please fill out all required fields.");
-            return;
-        }
-        onUpdate({ fullName, email, occupation, location, socialLinks, profilePic });
-        onClose();
+    const {setUser} = useContext(AuthContext);
+
+    const handleUpdate = async () => {
+    if (!fullName || !email || !occupation || !location) {
+        alert("Please fill out all required fields.");
+        return;
+    }
+
+    const updatedDetails = {
+        username: fullName,
+        email,
+        occupation,
+        location,
+        profileImage: profilePic, // Assuming profilePic is a base64 string or URL
     };
+
+    try {
+        const token = localStorage.getItem("token"); // Get JWT token
+        const response = await fetch(`http://localhost:5000/auth/update-profile/${userDetails._id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(updatedDetails),
+        });
+
+        const data = await response.json();
+       
+        if (response.ok) {
+            setUser(data.user); // Update user in AuthContext
+            onUpdate(data.user); // Update state in TaskManagement.js
+            alert("Profile updated successfully!");
+            onClose();
+        } else {
+            alert(data.error);
+        }
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        alert("An error occurred while updating the profile.");
+    }
+};
+
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
