@@ -220,7 +220,7 @@ const TaskManagement = () => {
     window.location.replace("/"); 
   };
 
-  const navigate = useNavigate(); // React Router navigation
+  
 
   useEffect(() => {
     const token = localStorage.getItem("token");

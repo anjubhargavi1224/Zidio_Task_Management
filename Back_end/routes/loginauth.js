@@ -1,7 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { verifyToken } from "../middleware/authmiddleware.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 import User from "../models/User.js"; // Ensure this is the correct model path
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
@@ -95,8 +95,7 @@ router.post("/logout", (req, res) => {
     }
 });
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 // Route to get logged-in user's profile info
 router.get("/me", verifyToken, async (req, res) => {
     try {
@@ -122,8 +121,10 @@ router.get("/me", verifyToken, async (req, res) => {
             message: "Profile updated successfully",
             user: updatedUser
         });
-=======
-=======
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 
 
@@ -145,7 +146,7 @@ router.get("/users", async (req, res) => {
 
 
 
->>>>>>> 872678f7053ebfab1436d7cb1c96d3b62329cc9d
+
 // **Forgot Password Route**
 router.post("/forgot-password", async (req, res) => {
     try {
@@ -213,14 +214,11 @@ router.post("/reset-password/:token", async (req, res) => {
         await user.save();
 
         res.json({ message: "Password reset successful. You can now log in!" });
->>>>>>> e09db5f1581734b8ccafbc79c26264e9da4bbd72
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
-
-<<<<<<< HEAD
-=======
 
 
 
@@ -256,13 +254,31 @@ router.put("/update-profile/:id", async (req, res) => {
 
 
 
-<<<<<<< HEAD
->>>>>>> e09db5f1581734b8ccafbc79c26264e9da4bbd72
-=======
 
 
 
 
 
->>>>>>> 872678f7053ebfab1436d7cb1c96d3b62329cc9d
+// **Delete User Route**
+router.delete("/delete-user/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Check if user exists
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        await user.remove();
+        res.status(200).json({ message: "User deleted successfully" });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+
+
 export default router;

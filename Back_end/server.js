@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import authRoutes from "./routes/loginauth.js";
 import taskRoutes from "./routes/taskRoutes.js";
-import { verifyToken, authorizeRoles } from "./middleware/authmiddleware.js";
+// import { verifyToken, authorizeRoles } from "./middleware/authmiddleware.js";
 
 dotenv.config();
 const app = express();
