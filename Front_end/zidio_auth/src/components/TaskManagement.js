@@ -1,19 +1,14 @@
-import React, { useState, useEffect } from "react";
-import md5 from "blueimp-md5"; // Import MD5 for hashing emails
-import {
-  FaSearch,
-  FaEdit,
-  FaTrash,
-  FaSave,
-  FaCheck,
-  FaUser ,
-  FaSignOutAlt,
-} from "react-icons/fa";
-import "./TaskManagement.css";
-import { RadialBarChart, RadialBar, Tooltip } from "recharts";
-import { useNavigate } from "react-router-dom"; 
-import UpdateProfile from './UpdateProfile'; // Import the UpdateProfile component
+import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
+import { AuthContext } from '../context/AuthContextProvider';
 
+import md5 from "blueimp-md5";
+import { FaSearch, FaEdit, FaTrash, FaSave, FaCheck, FaUser, FaSignOutAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import UpdateProfile from './UpdateProfile';
+import "./TaskManagement.css";
+
+// Function to get the gravatar image
 const getGravatarURL = (email) => {
   const hash = md5(email.trim().toLowerCase());
   return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
@@ -24,22 +19,27 @@ const TaskManagement = () => {
   const [activeSection, setActiveSection] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [showProfileOptions, setShowProfileOptions] = useState(false);
-  // const [showProfile, setShowProfile] = useState(false);
   const [showUpdateProfile, setShowUpdateProfile] = useState(false);
   const [notifications, setNotifications] = useState([]);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const{user, setUser} = useContext(AuthContext);
+  const [newNotifications, setNewNotifications] = useState(0);
+  const { user, setUser } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  // user details
+  // Additional States (Fix for the error)
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [completedCount, setCompletedCount] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
   const [userDetails, setUserDetails] = useState(null);
   const [avatarURL, setAvatarURL] = useState(getGravatarURL("fallback@example.com"));
+
   useEffect(() => {
-    if(userDetails?.email) {
+    if (userDetails?.email) {
       setAvatarURL(getGravatarURL(userDetails.email));
     }
-  }, [userDetails?.email])
+  }, [userDetails?.email]);
 
-// task fields
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
@@ -57,79 +57,49 @@ const TaskManagement = () => {
     status: "",
   });
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate();
-
-  // Fetch tasks on mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      console.log("No token, redirecting ...");
-      return navigate("/");
+      navigate("/");
+      return;
     }
+
     const fetchTasksAndUser = async () => {
       try {
-        // Fetch tasks
         const taskRes = await axios.get("/api/tasks", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setTasks(taskRes.data);
 
-        // Fetch logged-in user profile
         const userRes = await axios.get("/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // TEMPORARY MOCKING FOR TESTING
-        const user = userRes.data.user;
-        const profilePic = getGravatarURL(user.email);
-        const updatedUser = {
-          fullName: user.fullName || "N/A",
-          email: user.email,
-          occupation: user.occupation || "N/A",
-          location: user.location || "N/A",
-          socialLinks: user.socialLinks || "N/A",
-          profilePic,
-        };
-
-        setUserDetails(updatedUser);
-        localStorage.setItem("userDetails", JSON.stringify(updatedUser));
+        const userData = userRes.data;
+        const profilePic = getGravatarURL(userData.email);
+        setUserDetails({ ...userData, profilePic });
+        localStorage.setItem("userDetails", JSON.stringify({ ...userData, profilePic }));
       } catch (err) {
         console.error("Error fetching data:", err);
       }
     };
-
     fetchTasksAndUser();
-  }, []);
+  }, [navigate]);
 
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setNewTask({ ...newTask, [name]: value });
-  };
-
-  // task add
   const addTask = async () => {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.post("/api/tasks", newTask, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTasks((prev) => [...prev, res.data]);
-      setNewTask({
-        title: "",
-        description: "",
-        startDate: "",
-        endDate: "",
-        status: "inProgress",
-      });
+      setTasks([...tasks, res.data]);
+      setNewTask({ title: "", description: "", startDate: "", endDate: "", status: "inProgress" });
       setShowForm(false);
-      addNotification(`A new task "${res.data.title}" has been added.`);
     } catch (err) {
       console.error("Error adding task:", err);
     }
   };
 
-  // delete task
   const deleteTask = async (taskId) => {
     const token = localStorage.getItem("token");
     try {
@@ -142,24 +112,15 @@ const TaskManagement = () => {
     }
   };
 
-  // edit task
   const startEditing = (task) => {
     setEditingTaskId(task._id);
-    setEditedTask({
-      title: task.title,
-      description: task.description,
-      startDate: task.startDate,
-      endDate: task.endDate,
-      status: task.status,
-    });
+    setEditedTask({ ...task });
   };
 
   const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setEditedTask({ ...editedTask, [name]: value });
+    setEditedTask({ ...editedTask, [e.target.name]: e.target.value });
   };
 
-  // task save
   const saveEdit = async (taskId) => {
     const token = localStorage.getItem("token");
     try {
@@ -231,11 +192,8 @@ const TaskManagement = () => {
 
   return (
     <div className="task-container">
-
       <header className="top-header">
         <h2>Task Management</h2>
-
-        {/* Search bar */}
         <div className="search-box">
           <FaSearch className="search-icon" />
           <input
@@ -245,325 +203,46 @@ const TaskManagement = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-
-        {/* Profile and notification section */}
-        <div className="profile-section">
-          <div className="notification-container">
-            {/* Notification Bell Icon */}
-            <div className="notification-icon" onClick={() => setShowNotifications(!showNotifications)}>
-              🔔 {newNotifications > 0 && <span className="notification-badge">{newNotifications}</span>}
-            </div>
-
-            {/* Notification Dropdown */}
-            {showNotifications && (
-              <div className="notification-dropdown">
-                {notifications.length > 0 ? (
-                  notifications.map((note, index) => (
-                    <div key={index} className="notification-item">{note}</div>
-                  ))
-                ) : (
-                  <p className="no-notifications">No new notifications</p>
-                )}
-                <button className="clear-btn" onClick={clearNotifications}>Clear All</button>
-              </div>
-            )}
-          </div>
-
-          {/* Profile image with dropdown options */}
-          <div className="profile-container">
-            <img
-              src={avatarURL}
-              alt="Profile"
-              className="profile-pic"
-              onClick={() => setShowProfileOptions(!showProfileOptions)}
-            />
-            {showProfileOptions && (
-              <div className="profile-dropdown">
-                {!showProfile ? (
-                  <>
-                    <button
-                      className="profile-option"
-                      onClick={() => setShowProfile(true)}
-                    >
-                      <FaUser /> Profile
-                    </button>
-                    <button className="profile-option" onClick={handleLogout}>
-                      <FaSignOutAlt /> Logout
-                    </button>
-                  </>
-                ) : (
-                  <div className="profile-card">
-                    <img
-                      src={avatarURL}
-                      alt="Profile Pic"
-                      className="profile-image"
-                    />
-                    
-                    <p>{user?.username}</p>
-                    <p>{user?.role}</p>
-                    <p>{user?.email}</p>
-                    <p>{user?.occupation}</p>
-                    <p>{user?.location}</p>
-                    <p>{user?.socialLinks}</p>
-                    
-                
-                    <button
-                      className="update-btn"
-                      onClick={() => setShowUpdateProfile(true)}
-                    >
-                      Update Profile
-                    </button>
-                    <button
-                      className="back-btn"
-                      onClick={() => setShowProfile(false)}
-                    >
-                      Back
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
       </header>
-      {/* Sidebar with task filters */}
+
       <aside className="sidebar">
-        <div className="user-greeting">
-          <h3>Hello, Welcome</h3>
-        </div>
-        <p>Manage All Your Task In One Place</p>
-        <button
-          className={activeSection === "all" ? "active" : ""}
-          onClick={() => setActiveSection("all")}
-        >
+        <h3>Hello, Welcome</h3>
+        <button className={activeSection === "all" ? "active" : ""} onClick={() => setActiveSection("all")}>
           All Tasks
         </button>
-        <button
-          className={activeSection === "inProgress" ? "active" : ""}
-          onClick={() => setActiveSection("inProgress")}
-        >
+        <button className={activeSection === "inProgress" ? "active" : ""} onClick={() => setActiveSection("inProgress")}>
           In Progress
         </button>
-        <button
-          className={activeSection === "completed" ? "active" : ""}
-          onClick={() => setActiveSection("completed")}
-        >
+        <button className={activeSection === "completed" ? "active" : ""} onClick={() => setActiveSection("completed")}>
           Completed
         </button>
-
-        <div className="chart-container">
-          <RadialBarChart
-            width={150}
-            height={150}
-            innerRadius="50%"
-            outerRadius="90%"
-            data={chartData}
-            startAngle={180}
-            endAngle={0}
-          >
-            <RadialBar minAngle={15} background clockWise dataKey="value" />
-            <Tooltip />
-          </RadialBarChart>
-        </div>
-
-        <div className="task-summary">
-          <div>
-            <span className="summary-label-com">Completed:</span>{" "}
-            <span>{completedCount}</span>
-          </div>
-          <div>
-            <span className="summary-label-pen">Pending:</span>{" "}
-            <span>{pendingCount}</span>
-          </div>
-        </div>
       </aside>
 
       <div className="main-content">
-        <header className="top-header">
-          <h2>Task Management</h2>
-
-          {/* Search bar */}
-          <div className="search-box">
-            <FaSearch className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search by title"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          {/* Profile and notification section */}
-          <div className="profile-section">
-            <div className="notification-container">
-              {/* Notification Bell Icon */}
-              <div className="notification-icon" onClick={() => setShowNotifications(!showNotifications)}>
-                🔔 {notifications.length > 0 && <span className="notification-badge">{notifications.length}</span>}
-              </div>
-
-              {/* Notification Dropdown */}
-              {showNotifications && (
-                <div className="notification-dropdown">
-                  {notifications.length > 0 ? (
-                    notifications.map((note, index) => (
-                      <div key={index} className="notification-item">{note}</div>
-                    ))
-                  ) : (
-                    <p className="no-notifications">No new notifications</p>
-                  )}
-                  <button className="clear-btn" onClick={clearNotifications}>Clear All</button>
-                </div>
-              )}
-            </div>
-
-            {/* Profile image with dropdown options */}
-            <div className="profile-container">
-              <img
-                src={avatarURL}
-                alt="Profile"
-                className="profile-pic"
-                onClick={() => setShowProfileOptions(!showProfileOptions)}
-              />
-              {showProfileOptions && (
-                <div className="profile-dropdown">
-                  {!showProfile ? (
-                    <>
-                      <button
-                        className="profile-option"
-                        onClick={() => setShowProfile(true)}
-                      >
-                        <FaUser  /> Profile
-                      </button>
-                      <button className="profile-option" onClick={handleLogout}>
-                        <FaSignOutAlt /> Logout
-                      </button>
-                    </>
-                  ) : (
-                    <div className="profile-card">
-                      <img
-                        src={avatarURL}
-                        alt="Profile Pic"
-                        className="profile-image"
-                      />
-                      <p>{userDetails.fullName}</p>
-                      <p>{userDetails.email}</p>
-                      <p>{userDetails.occupation}</p>
-                      <p>{userDetails.location}</p>
-                      <p>{userDetails.socialLinks}</p>
-                      <button
-                        className="update-btn"
-                        onClick={() => setShowUpdateProfile(true)}
-                      >
-                        Update Profile
-                      </button>
-                      <button
-                        className="back-btn"
-                        onClick={() => setShowProfile(false)}
-                      >
-                        Back
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </header>
-
         {activeSection === "all" && (
-          <button className="add-task-btn" onClick={() => setShowForm(true)}>
-            +
-          </button>
+          <button className="add-task-btn" onClick={() => setShowForm(true)}>+ Add Task</button>
         )}
 
         {showForm && (
           <div className="task-form-popup">
-            <input
-              type="text"
-              name="title"
-              placeholder="Title"
-              value={newTask.title}
-              onChange={handleFormChange}
-            />
-            <textarea
-              name="description"
-              placeholder="Description"
-              value={newTask.description}
-              onChange={handleFormChange}
-            ></textarea>
-            <input
-              type="date"
-              name="startDate"
-              value={newTask.startDate}
-              onChange={handleFormChange}
-            />
-            <input
-              type="date"
-              name="endDate"
-              value={newTask.endDate}
-              onChange={handleFormChange}
-            />
-            <div className="task-form-buttons">
-              <button
-                className="cancel-task-btn"
-                onClick={() => setShowForm(false)}
-              >
-                Cancel
-              </button>
-              <button onClick={addTask}>Add Task</button>
-            </div>
+            <input type="text" name="title" placeholder="Title" value={newTask.title} onChange={handleEditChange} />
+            <textarea name="description" placeholder="Description" value={newTask.description} onChange={handleEditChange} />
+            <button onClick={addTask}>Add Task</button>
           </div>
         )}
 
-        {showUpdateProfile && (
-          <UpdateProfile
-            onClose={() => setShowUpdateProfile(false)}
-            userDetails={userDetails}
-            onUpdate={updateUserDetails}
-          />
-        )}
-
-        {/* Display Tasks */}
         <div className="TASK_GRID">
           {tasks
-            .filter(
-              (task) =>
-                (activeSection === "all" || task.status === activeSection) &&
-                task.title.toLowerCase().includes(searchQuery.toLowerCase())
-            )
+            .filter((task) => activeSection === "all" || task.status === activeSection)
             .map((task) => (
               <div key={task.id} className="TASK_CARD">
-                {editingTaskId === task.id ? (
-                  <>
-                    <input type="text" name="title" value={editedTask.title} onChange={handleEditChange} />
-                    <textarea name="description" value={editedTask.description} onChange={handleEditChange} />
-                    <input type="date" name="startDate" value={editedTask.startDate} onChange={handleEditChange} />
-                    <input type="date" name="endDate" value={editedTask.endDate} onChange={handleEditChange} />
-                    <div className="TASK_ACTIONS">
-                      <FaSave className="SAVE_ICON" onClick={() => saveEdit(task.id)} />
-                      <button className="CANCEL_EDIT_BTN" onClick={() => setEditingTaskId(null)}>Cancel Edit</button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <h3>Title: {task.title}</h3>
-                    <p>Description: {task.description}</p>
-                    <p className="TASK_DATE">Start: {task.startDate} | End: {task.endDate}</p>
-                    <div className="TASK_ACTIONS">
-                      <FaEdit className="EDIT_ICON" onClick={() => startEditing(task)} />
-                      <FaTrash className="DELETE_ICON" onClick={() => deleteTask(task.id)} />
-                      {task.status !== "completed" && (
-                        <button className="COMPLETE_BTN" onClick={() => completeTask(task.id)}>
-                          <FaCheck className="COMPLETE_ICON" /> Complete
-                        </button>
-                      )}
-                    </div>
-                  </>
-                )}
+                <h3>{task.title}</h3>
+                <p>{task.description}</p>
+                <FaEdit className="EDIT_ICON" onClick={() => startEditing(task)} />
+                <FaTrash className="DELETE_ICON" onClick={() => deleteTask(task.id)} />
               </div>
             ))}
         </div>
-
       </div>
     </div>
   );

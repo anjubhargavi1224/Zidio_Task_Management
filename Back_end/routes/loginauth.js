@@ -1,11 +1,11 @@
-import express from "express";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { verifyToken } from "../middleware/authMiddleware.js";
-import User from "../models/User.js"; // Ensure this is the correct model path
-import dotenv from "dotenv";
-import nodemailer from "nodemailer";
-import crypto from "crypto";
+const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { verifyToken } = require("../middleware/authmiddleware.js");
+const User = require("../models/User.js"); // Ensure this is the correct model path
+const dotenv = require("dotenv");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 dotenv.config();
 const router = express.Router();
@@ -95,41 +95,6 @@ router.post("/logout", (req, res) => {
     }
 });
 
-
-// Route to get logged-in user's profile info
-router.get("/me", verifyToken, async (req, res) => {
-    try {
-        const {fullName, email, occupation, location, socialLinks, profilePic} = req.body;
-        const updatedUser = await User.findByIdAndUpdate(
-            req.user.id,
-            {
-                fullName,
-                email,
-                occupation,
-                location,
-                socialLinks,
-                profilePic
-            },
-            {new: true} //return updated document
-        ).select("_password"); //exclude password
-
-        if(!updatedUser){
-            return res.status(404).json({error: "user not found"});
-        }
-
-        res.status(200).json({
-            message: "Profile updated successfully",
-            user: updatedUser
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-
-
-
-
 // Get all users
 router.get("/users", async (req, res) => {
     try {
@@ -139,12 +104,6 @@ router.get("/users", async (req, res) => {
         res.status(500).json({ error: "Error fetching users" });
     }
 });
-
-
-
-
-
-
 
 
 // **Forgot Password Route**
@@ -220,10 +179,6 @@ router.post("/reset-password/:token", async (req, res) => {
     }
 });
 
-
-
-
-
 router.put("/update-profile/:id", async (req, res) => {
     try {
         const { id } = req.params;
@@ -251,34 +206,4 @@ router.put("/update-profile/:id", async (req, res) => {
     }
 });
 
-
-
-
-
-
-
-
-
-// **Delete User Route**
-router.delete("/delete-user/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        // Check if user exists
-        const user = await User.findById(id);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        await user.remove();
-        res.status(200).json({ message: "User deleted successfully" });
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-
-
-
-export default router;
+module.exports = router;

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from "react";
 import "./AuthForm.css"; // Import external CSS for styling
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // Import icons for better UI
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContextProvider";
+import { AuthContext } from "../context/AuthContextProvider"; // Ensure correct import
 
 // Authentication Form Component
 const AuthForm = () => {

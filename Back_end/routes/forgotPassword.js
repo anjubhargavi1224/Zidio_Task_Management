@@ -1,8 +1,8 @@
-import express from "express";
-import crypto from "crypto";
-import bcrypt from "bcrypt";
-import nodemailer from "nodemailer";
-import User from "../models/User.js";
+const express = require("express");
+const crypto = require("crypto");
+const bcrypt = require ("bcrypt");
+const nodemailer = require("nodemailer");
+const User = require("../models/User.js");
 
 const router = express.Router();
 
@@ -78,5 +78,5 @@ router.post("/reset-password/:token", async (req, res) => {
     }
 });
 
-export default router;
+module.exports =  router;
 
