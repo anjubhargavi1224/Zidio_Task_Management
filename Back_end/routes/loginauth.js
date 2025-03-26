@@ -95,7 +95,6 @@ router.post("/logout", (req, res) => {
     }
 });
 
-
 // Get all users
 router.get("/users", async (req, res) => {
     try {
@@ -105,11 +104,6 @@ router.get("/users", async (req, res) => {
         res.status(500).json({ error: "Error fetching users" });
     }
 });
-
-
-
-
-
 
 
 // **Forgot Password Route**
@@ -179,11 +173,11 @@ router.post("/reset-password/:token", async (req, res) => {
         await user.save();
 
         res.json({ message: "Password reset successful. You can now log in!" });
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
-
 
 router.put("/update-profile/:id", async (req, res) => {
     try {
@@ -211,6 +205,5 @@ router.put("/update-profile/:id", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
 
 module.exports = router;

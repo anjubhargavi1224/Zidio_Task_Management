@@ -134,6 +134,62 @@ const TaskManagement = () => {
     }
   };
 
+  // task marked for complete
+  const completeTask = async (taskId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const taskToUpdate = tasks.find((task) => task._id === taskId);
+      if (!taskToUpdate) return;
+
+      const updatedTask = { ...taskToUpdate, status: "completed" };
+      const res = await axios.put(`/api/tasks/${taskId}`, updatedTask, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTasks(tasks.map((task) => (task._id === taskId ? res.data : task)));
+      addNotification(`Task "${taskToUpdate.title}" marked as completed.`);
+    } catch (err) {
+      console.error("Error completing task:", err);
+    }
+  };
+
+  // notification button
+  const addNotification = (message) => {
+    const updated = [...notifications, message];
+    setNotifications(updated);
+    localStorage.setItem("notifications", JSON.stringify(updated));
+  };
+
+  // notification clear
+  const clearNotifications = () => {
+    setNotifications([]);
+    localStorage.removeItem("notifications");
+    setShowNotifications(false);
+  };
+
+  // update profile option
+  const updateUserDetails = (updated) => {
+    setUserDetails(updated);
+    localStorage.setItem("userDetails", JSON.stringify(updated));
+  };
+
+  // logout option from profile
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove stored JWT token
+    localStorage.removeItem("userRole"); // Remove role if stored
+
+    // Redirect to login page and clear history to prevent going back
+    window.location.replace("/"); 
+  };
+
+  
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/"); // Redirect to login if not authenticated
+    }
+  }, [navigate]); // Run on component mount
+
   return (
     <div className="task-container">
       <header className="top-header">
