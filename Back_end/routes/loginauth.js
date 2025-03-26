@@ -1,11 +1,11 @@
-import express from "express";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { verifyToken } from "../middleware/authmiddleware.js";
-import User from "../models/User.js"; // Ensure this is the correct model path
-import dotenv from "dotenv";
-import nodemailer from "nodemailer";
-import crypto from "crypto";
+const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { verifyToken } = require("../middleware/authmiddleware.js");
+const User = require("../models/User.js"); // Ensure this is the correct model path
+const dotenv = require("dotenv");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 dotenv.config();
 const router = express.Router();
@@ -95,39 +95,6 @@ router.post("/logout", (req, res) => {
     }
 });
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-// Route to get logged-in user's profile info
-router.get("/me", verifyToken, async (req, res) => {
-    try {
-        const {fullName, email, occupation, location, socialLinks, profilePic} = req.body;
-        const updatedUser = await User.findByIdAndUpdate(
-            req.user.id,
-            {
-                fullName,
-                email,
-                occupation,
-                location,
-                socialLinks,
-                profilePic
-            },
-            {new: true} //return updated document
-        ).select("_password"); //exclude password
-
-        if(!updatedUser){
-            return res.status(404).json({error: "user not found"});
-        }
-
-        res.status(200).json({
-            message: "Profile updated successfully",
-            user: updatedUser
-        });
-=======
-=======
-
-
-
-
 
 // Get all users
 router.get("/users", async (req, res) => {
@@ -145,7 +112,6 @@ router.get("/users", async (req, res) => {
 
 
 
->>>>>>> 872678f7053ebfab1436d7cb1c96d3b62329cc9d
 // **Forgot Password Route**
 router.post("/forgot-password", async (req, res) => {
     try {
@@ -213,17 +179,10 @@ router.post("/reset-password/:token", async (req, res) => {
         await user.save();
 
         res.json({ message: "Password reset successful. You can now log in!" });
->>>>>>> e09db5f1581734b8ccafbc79c26264e9da4bbd72
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
-
-<<<<<<< HEAD
-=======
-
-
-
 
 
 router.put("/update-profile/:id", async (req, res) => {
@@ -254,15 +213,4 @@ router.put("/update-profile/:id", async (req, res) => {
 });
 
 
-
-
-<<<<<<< HEAD
->>>>>>> e09db5f1581734b8ccafbc79c26264e9da4bbd72
-=======
-
-
-
-
-
->>>>>>> 872678f7053ebfab1436d7cb1c96d3b62329cc9d
-export default router;
+module.exports = router;

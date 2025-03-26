@@ -58,7 +58,6 @@ const TaskManagement = () => {
   });
 
   const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate();
 
   // Fetch tasks on mount
   useEffect(() => {

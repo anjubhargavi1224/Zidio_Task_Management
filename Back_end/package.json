@@ -1,6 +1,7 @@
 {
   "name": "back_end",
   "version": "1.0.0",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",

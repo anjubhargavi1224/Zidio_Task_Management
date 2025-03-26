@@ -1,10 +1,10 @@
-import express from "express";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
-import cors from "cors";
-import authRoutes from "./routes/loginauth.js";
-import taskRoutes from "./routes/taskRoutes.js";
-import { verifyToken, authorizeRoles } from "./middleware/authmiddleware.js";
+const express = require ("express");
+const dotenv = require ("dotenv");
+const mongoose = require ("mongoose");
+const cors = require ("cors");
+const authRoutes = require ("./routes/loginauth.js");
+const taskRoutes = require("./routes/taskRoutes.js");
+const { verifyToken, authorizeRoles } = require ("./middleware/authmiddleware.js");
 
 dotenv.config();
 const app = express();
@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 // Authentication Routes
 app.use("/auth", authRoutes);
 
-// task routes
+// Task Routes
 app.use('/api/tasks', taskRoutes);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
