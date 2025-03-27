@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './UpdateProfile.css'; // Import the CSS file for styling
-import axios from 'axios';
 
 const UpdateProfile = ({ onClose, userDetails = {}, onUpdate }) => {
     const [fullName, setFullName] = useState(userDetails?.fullName || "");
@@ -10,27 +9,13 @@ const UpdateProfile = ({ onClose, userDetails = {}, onUpdate }) => {
     const [socialLinks, setSocialLinks] = useState(userDetails?.socialLinks || "");
     const [profilePic, setProfilePic] = useState(userDetails?.profilePic || "");
 
-    const handleUpdate = async () => {
-        try {
-            const token = localStorage.getItem("token"); // JWT in localStorage
-    
-            const response = await axios.put(
-                "http://localhost:5000/api/auth/UpdateProfile",
-                { fullName, email, occupation, location, socialLinks, profilePic },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
-    
-            alert("Profile updated successfully!");
-            onUpdate(response.data.user);
-            onClose();
-        } catch (error) {
-            console.error("Error updating profile:", error);
-            alert("Failed to update profile.");
+    const handleUpdate = () => {
+        if (!fullName || !email || !occupation || !location) {
+            alert("Please fill out all required fields.");
+            return;
         }
+        onUpdate({ fullName, email, occupation, location, socialLinks, profilePic });
+        onClose();
     };
 
     const handleFileChange = (e) => {
