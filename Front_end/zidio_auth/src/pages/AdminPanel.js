@@ -175,9 +175,7 @@ const AdminPanel = () => {
         {selectedTab === "users" && (
           <section className="admin-users">
             <h2>User Management</h2>
-            <button onClick={() => setShowCreateUser(true)}>
-              <FaPlus /> Create User
-            </button>
+            
             {showCreateUser && (
               <CreateUser onClose={() => setShowCreateUser(false)} />
             )}
