@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   FaUsers,
   FaTasks,
@@ -12,6 +12,7 @@ import { BarChart, Bar, XAxis, Tooltip, Legend } from "recharts";
 import CreateUser  from "./CreateUser"; // Import the CreateUser  component
 import "./AdminPanel.css";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContextProvider";
 
 const AdminPanel = () => {
   const [selectedTab, setSelectedTab] = useState("dashboard");
@@ -21,7 +22,7 @@ const AdminPanel = () => {
   const [users, setUsers] = useState([]); // State for users
   const [chartData, setChartData] = useState([]);
   const [showCreateUser, setShowCreateUser] = useState(false); // State to control Create User form visibility
-
+  const {user, setUser} = useContext(AuthContext); // Get user from AuthContext
   // Fetch users from backend
   useEffect(() => {
     const fetchUsers = async () => {
@@ -118,12 +119,35 @@ const AdminPanel = () => {
     }
   }, [navigate]); // Run on component mount
 
-  const handleDeleteUser = (userId) => {
-    const isConfirmed = window.confirm("Are you sure you want to delete this user?");
-    if (isConfirmed) {
-      setUsers(users.filter((user) => user._id !== userId));
+  const handleDeleteUser = async (userId) => {
+    const token = localStorage.getItem("token"); // Ensure user is authenticated
+    if (!token) {
+        alert("Unauthorized: Please log in.");
+        return;
     }
-  };
+
+    try {
+        const response = await fetch(`http://localhost:5000/auth/delete-user/${userId}`, { 
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert("User deleted successfully!");
+            // Refresh the user list after deletion
+            setUsers(users.filter(user => user._id !== userId));
+        } else {
+            alert(data.error || "Failed to delete user");
+        }
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        alert("An error occurred. Please try again.");
+    }
+};
+
 
   return (
     <div className="admin-container">

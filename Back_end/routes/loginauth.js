@@ -207,4 +207,26 @@ router.put("/update-profile/:id", async (req, res) => {
 });
 
 
+router.delete("/delete-user/:id", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ error: "Unauthorized: Only admins can delete users" });
+        }
+
+        const { id } = req.params;
+        const user = await User.findByIdAndDelete(id);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
+
+
+
 module.exports = router;
