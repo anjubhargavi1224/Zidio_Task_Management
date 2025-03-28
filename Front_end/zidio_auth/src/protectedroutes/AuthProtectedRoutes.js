@@ -1,11 +1,20 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 
-const AuthProtectedRoutes = () => {
-    const token = localStorage.getItem("token"); 
+const ProtectedRoute = ({ requiredRole }) => {
+  const { isAuthenticated, role } = useAuth();
 
-   
+  // If not authenticated, redirect to login
+  if (isAuthenticated()) {
+    return <Navigate to="/login" />;
+  }
 
-  return token ?  <Outlet/> : <Navigate to="/" />;
-}
+  // If the required role doesn't match, deny access
+  if (requiredRole && role !== requiredRole) {
+    return <Navigate to="/unauthorized" />;
+  }
 
-export default AuthProtectedRoutes
+  return <Outlet />;
+};
+
+export default ProtectedRoute;

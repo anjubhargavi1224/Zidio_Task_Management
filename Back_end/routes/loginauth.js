@@ -206,4 +206,5 @@ router.put("/update-profile/:id", async (req, res) => {
     }
 });
 
+
 module.exports = router;

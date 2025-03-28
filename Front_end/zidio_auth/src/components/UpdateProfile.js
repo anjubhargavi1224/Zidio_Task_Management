@@ -1,39 +1,70 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './UpdateProfile.css'; // Import the CSS file for styling
+import { AuthContext } from "../context/AuthContextProvider";
 
-const UpdateProfile = ({ onClose, userDetails = {}, onUpdate }) => {
-    const [fullName, setFullName] = useState(userDetails?.fullName || "");
+const UpdateProfile = ({ onClose, userDetails= {}, onUpdate }) => {
+    const {user,setUser} = useContext(AuthContext);
+    const [username, setUserName] = useState(userDetails?.username || "");
     const [email, setEmail] = useState(userDetails?.email || "");
     const [occupation, setOccupation] = useState(userDetails?.occupation || "");
     const [location, setLocation] = useState(userDetails?.location || "");
     const [socialLinks, setSocialLinks] = useState(userDetails?.socialLinks || "");
-    const [profilePic, setProfilePic] = useState(userDetails?.profilePic || "");
-
-    const handleUpdate = () => {
-        if (!fullName || !email || !occupation || !location) {
+    const [profileImage, setProfileImage] = useState(userDetails?.profileImage || "");
+    
+    
+    const handleUpdate = async () => {
+        if (!username || !email || !occupation || !location) {
             alert("Please fill out all required fields.");
             return;
         }
-        onUpdate({ fullName, email, occupation, location, socialLinks, profilePic });
-        onClose();
-    };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            if (!file.type.startsWith("image/")) {
-                alert("Please upload a valid image file.");
-                return;
+        const updatedDetails = {
+            username,
+            email,
+            occupation,
+            location,
+            profileImage, // Send Base64 string
+            socialLinks
+        };
+        try {
+            const token = localStorage.getItem("token"); // Get JWT token
+            const response = await fetch(`http://localhost:5000/auth/update-profile/${userDetails._id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(updatedDetails),
+            });
+    
+            const data = await response.json();
+           
+            if (response.ok) {
+                setUser(data.user); // Update user in AuthContext
+                onUpdate(data.user); // Update state in TaskManagement.js
+                alert("Profile updated successfully!");
+                onClose();
+            } else {
+                alert(data.error);
             }
-            if (file.size > 10 * 1024 * 1024) {
-                alert("File size should be less than 2MB.");
-                return;
-            }
-            const reader = new FileReader();
-            reader.onloadend = () => setProfilePic(reader.result);
-            reader.readAsDataURL(file);
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            alert("An error occurred while updating the profile.");
         }
     };
+
+    const handleFileChange = async (event) => {
+        const file = event.target.files[0];
+    
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file); // Convert to Base64
+            reader.onloadend = () => {
+                setProfileImage(reader.result); // Store Base64 string in state
+            };
+        }
+    };
+    
 
     return (
         <div className="modal-overlay">
@@ -47,10 +78,10 @@ const UpdateProfile = ({ onClose, userDetails = {}, onUpdate }) => {
                         <fieldset className="fieldset">
                             <label htmlFor="profilePic" className="fieldset-label">Profile Picture</label>
                             <input id="profilePic" type="file" accept="image/*" onChange={handleFileChange} />
-                            {profilePic && <img src={profilePic} alt="Profile Preview" className="profile-preview" />}
+                            {profileImage && <img src={user.profileImage} alt="Profile Preview" className="profile-preview" />}
                             
                             <label htmlFor="fullName" className="fieldset-label">Full Name</label>
-                            <input id="fullName" type="text" className="input" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                            <input id="fullName" type="text" className="input" value={username} onChange={(e) => setUserName(e.target.value)} />
                             
                             <label htmlFor="email" className="fieldset-label">Email</label>
                             <input id="email" type="email" className="input" value={email} onChange={(e) => setEmail(e.target.value)} />
