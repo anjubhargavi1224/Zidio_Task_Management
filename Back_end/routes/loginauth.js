@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { verifyToken } = require("../middleware/authmiddleware.js");
+const { verifyToken } = require("../middleware/auth.js");
 const User = require("../models/User.js"); // Ensure this is the correct model path
 const dotenv = require("dotenv");
 const nodemailer = require("nodemailer");

@@ -19,7 +19,7 @@ const AuthForm = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [error, setError] = useState(""); // New: Error handling state
-  const{user, setUser} = useContext(AuthContext);
+  const{user, setUser, token} = useContext(AuthContext);
 
   const navigate = useNavigate(); // Initialize navigate function
 
@@ -76,6 +76,7 @@ const AuthForm = () => {
   
       const data = await response.json();
       if (response.ok) {
+        console.log(data)
         setUser(data.user)
         localStorage.setItem("token", data.token);
         localStorage.setItem("userRole", data.user.role);

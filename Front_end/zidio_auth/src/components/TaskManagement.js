@@ -14,6 +14,8 @@ import { RadialBarChart, RadialBar, Tooltip } from "recharts";
 import { useNavigate } from "react-router-dom";
 import UpdateProfile from './UpdateProfile'; // Import the UpdateProfile component
 import { AuthContext } from "../context/AuthContextProvider";
+import { updateTaskDetails, getTasks, createTask, createSelfTask, deleteTask, updateTaskStatus  } from "../services/taskService";
+
 
 
 // Function to generate Gravatar image URL based on the hashed email
@@ -36,9 +38,116 @@ const TaskManagement = () => {
   const [newNotifications, setNewNotifications] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
-  const{user, setUser} = useContext(AuthContext);
+  const{user} = useContext(AuthContext);
+  const [taskData, setTaskData] = useState({ title: "", description: "", startDate: "", endDate: "", assignedTo: "" });
+  const API_URL = "http://localhost:5000/tasks"; 
+  
+const token = localStorage.getItem("token");
 
 
+///////////////////////////////////////////////////////////////////////////////////
+
+  useEffect(() => {
+    fetchTasks();
+}, []);
+ const fetchTasks = async () => {
+  try {
+      const response = await getTasks(token);
+      setTasks(response);
+  } catch (error) {
+      console.error("Error fetching tasks", error);
+  }
+};
+const handleChange = (e) => {
+  setTaskData({ ...taskData, [e.target.name]: e.target.value });
+};
+//////////////////////////////////////////////
+//working perfectly
+
+const handleCreateTask = async () => {
+  try {
+      if (user.role === "admin") {
+          await createTask(taskData, token);
+      } else {
+          await createSelfTask(taskData, token);
+      }
+      fetchTasks();
+      setShowForm(false);
+  } catch (error) {
+      console.error("Error creating task", error);
+  }
+};
+
+///////////////////////////////////////////////
+//working perfectly
+
+const handleDeleteTask = async (taskId) => {
+  try {
+      await deleteTask(taskId, token);
+      fetchTasks();
+  } catch (error) {
+      console.error("Error deleting task", error);
+  }
+};
+
+
+//////////////////////////////////////////////////////
+ // Mark a task as completed
+ const completeTask = async (taskId) => {
+  try {
+    // Update task status in backend
+    await handleUpdateStatus(taskId, "completed");
+
+    // Optimistically update local state
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task._id === taskId ? { ...task, status: "completed" } : task
+      )
+    );
+
+    // Find completed task for notification
+    const completedTask = tasks.find((task) => task._id === taskId);
+    if (completedTask) {
+      addNotification(`Task "${completedTask.title}" has been completed!`);
+    }
+  } catch (error) {
+    console.error("Error completing task:", error);
+  }
+};
+
+const handleUpdateStatus = async (taskId, status) => {
+  try {
+    await updateTaskStatus(taskId, status, token);
+    fetchTasks(); // Ensure tasks are updated from the backend
+  } catch (error) {
+    console.error("Error updating status", error);
+  }
+};
+
+
+
+
+//////////////////////////////////////////////////////////////
+
+const handleUpdateTask = async () => {
+  if (!editingTaskId) return;
+
+  try {
+      await updateTaskDetails(editingTaskId, editedTask, token);
+      fetchTasks(); // Refresh task list
+      setEditingTaskId(null);
+  } catch (error) {
+      console.error("Error updating task", error);
+  }
+};
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////
 
   // User details state
   const [userDetails, setUserDetails] = useState(() => {
@@ -89,7 +198,7 @@ const TaskManagement = () => {
   });
 
   // State for editing a task
-  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editingTaskId, setEditingTaskId] = useState(0);
   const [editedTask, setEditedTask] = useState({
     title: "",
     description: "",
@@ -97,6 +206,8 @@ const TaskManagement = () => {
     endDate: "",
     status: "",
   });
+
+  
 
   // State for search query
   const [searchQuery, setSearchQuery] = useState("");
@@ -142,7 +253,7 @@ const TaskManagement = () => {
   
 
   // Add a new task to the task list
-  const addTask = () => {
+  const addTask = async () => {
     if (
       newTask.title &&
       newTask.description &&
@@ -167,16 +278,11 @@ const TaskManagement = () => {
     }
   };
 
-  // Delete a task based on its ID
-  const deleteTask = (taskId) => {
-    const updatedTasks = tasks.filter((task) => task.id !== taskId);
-    setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-  };
+ 
 
   // Start editing a specific task
   const startEditing = (task) => {
-    setEditingTaskId(task.id);
+    setEditingTaskId(task._id);
     setEditedTask({
       title: task.title,
       description: task.description,
@@ -185,21 +291,26 @@ const TaskManagement = () => {
       status: task.status,
     });
   };
+  
 
   // Handle input changes while editing a task
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setEditedTask({ ...editedTask, [name]: value });
+    setEditedTask((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   // Save the edited task details
-  const saveEdit = (taskId) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, ...editedTask } : task
-    );
-    setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-    setEditingTaskId(null);
+  const saveEdit = async (taskId) => {
+    try {
+      await updateTaskDetails(taskId, editedTask, token); // Send update to backend
+      fetchTasks(); // Refresh tasks from backend
+      setEditingTaskId(null);
+    } catch (error) {
+      console.error("Error saving task", error);
+    }
   };
 
   // Chart data for task overview
@@ -208,18 +319,7 @@ const TaskManagement = () => {
     { name: "Pending", value: tasks.filter(task => task.status !== "completed").length, fill: "#EF4444" },
   ];
 
-  // Mark a task as completed
-  const completeTask = (taskId) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, status: "completed" } : task
-      )
-    );
-    const completedTask = tasks.find((task) => task.id === taskId);
-    if (completedTask) {
-      addNotification(`Task "${completedTask.title}" has been completed!`); // Notify user
-    }
-  };
+ 
 
   const clearNotifications = () => {
     const userId = userDetails.email; // Assuming user ID is based on email for simplicity
@@ -433,26 +533,26 @@ const TaskManagement = () => {
               type="text"
               name="title"
               placeholder="Title"
-              value={newTask.title}
-              onChange={handleFormChange}
+              
+              onChange={handleChange}
             />
             <textarea
               name="description"
               placeholder="Description"
-              value={newTask.description}
-              onChange={handleFormChange}
+              
+              onChange={handleChange}
             ></textarea>
             <input
               type="date"
               name="startDate"
-              value={newTask.startDate}
-              onChange={handleFormChange}
+              
+              onChange={handleChange}
             />
             <input
               type="date"
               name="endDate"
-              value={newTask.endDate}
-              onChange={handleFormChange}
+              
+              onChange={handleChange}
             />
             <div className="task-form-buttons">
               <button
@@ -461,7 +561,7 @@ const TaskManagement = () => {
               >
                 Cancel
               </button>
-              <button onClick={addTask}>Add Task</button>
+              <button onClick={handleCreateTask}>Add Task</button>
             </div>
           </div>
         )}
@@ -482,16 +582,16 @@ const TaskManagement = () => {
               (activeSection === "all" || task.status === activeSection) &&
               task.title.toLowerCase().includes(searchQuery.toLowerCase())
             )
-            .map((task) => (
+            .map((task,index) => (
               <div key={task.id} className="task-card">
-                {editingTaskId === task.id ? (
+                {editingTaskId === task._id ? (
                   <>
                     <input type="text" name="title" value={editedTask.title} onChange={handleEditChange} />
                     <textarea name="description" value={editedTask.description} onChange={handleEditChange} />
                     <input type="date" name="startDate" value={editedTask.startDate} onChange={handleEditChange} />
                     <input type="date" name="endDate" value={editedTask.endDate} onChange={handleEditChange} />
                     <div className="task-actions">
-                      <FaSave className="save-icon" onClick={() => saveEdit(task.id)} />
+                      <FaSave className="save-icon" onClick={() => saveEdit(task._id)} />
                       <button className="cancel-btn" onClick={() => setEditingTaskId(null)}>Cancel</button>
                     </div>
                   </>
@@ -502,9 +602,9 @@ const TaskManagement = () => {
                     <p className="task-date">Start: {task.startDate} | End: {task.endDate}</p>
                     <div className="task-actions">
                       <FaEdit className="edit-icon" onClick={() => startEditing(task)} />
-                      <FaTrash className="delete-icon" onClick={() => deleteTask(task.id)} />
+                      <FaTrash className="delete-icon" onClick={() => handleDeleteTask(task._id)} />
                       {task.status !== "completed" && (
-                        <button className="complete-btn" onClick={() => completeTask(task.id)}>
+                        <button className="complete-btn" onClick={() => completeTask(task._id)}>
                           <FaCheck className="complete-icon" /> Complete
                         </button>
                       )}
