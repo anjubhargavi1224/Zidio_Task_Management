@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect /*useContext*/ } from "react";
 import {
   FaUsers,
   FaTasks,
@@ -6,13 +6,13 @@ import {
   FaEdit,
   FaSave,
   FaTrash,
-  FaPlus,
+  /*FaPlus*/
 } from "react-icons/fa";
 import { BarChart, Bar, XAxis, Tooltip, Legend } from "recharts";
-import CreateUser  from "./CreateUser"; // Import the CreateUser  component
+import CreateUser from "./CreateUser"; // Import the CreateUser  component
 import "./AdminPanel.css";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContextProvider";
+// import { AuthContext } from "../context/AuthContextProvider";
 
 const AdminPanel = () => {
   const [selectedTab, setSelectedTab] = useState("dashboard");
@@ -22,7 +22,7 @@ const AdminPanel = () => {
   const [users, setUsers] = useState([]); // State for users
   const [chartData, setChartData] = useState([]);
   const [showCreateUser, setShowCreateUser] = useState(false); // State to control Create User form visibility
-  const {user, setUser} = useContext(AuthContext); // Get user from AuthContext
+  // const { user, setUser } = useContext(AuthContext); // Get user from AuthContext
   // Fetch users from backend
   useEffect(() => {
     const fetchUsers = async () => {
@@ -50,7 +50,7 @@ const AdminPanel = () => {
     const filteredTasks = tasks.filter(
       (task) =>
         (activeSection === "all" || task.status === activeSection) &&
-        (selectedUser === "" || task.assignedTo === selectedUser)
+        (selectedUser === "" || (Array.isArray(task.assignedTo) && task.assignedTo.includes(selectedUser))) // Safety check
     );
 
     const completedCount = filteredTasks.filter(
@@ -122,31 +122,31 @@ const AdminPanel = () => {
   const handleDeleteUser = async (userId) => {
     const token = localStorage.getItem("token"); // Ensure user is authenticated
     if (!token) {
-        alert("Unauthorized: Please log in.");
-        return;
+      alert("Unauthorized: Please log in.");
+      return;
     }
 
     try {
-        const response = await fetch(`http://localhost:5000/auth/delete-user/${userId}`, { 
-            method: "DELETE",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-            },
-        });
+      const response = await fetch(`http://localhost:5000/auth/delete-user/${userId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
 
-        const data = await response.json();
-        if (response.ok) {
-            alert("User deleted successfully!");
-            // Refresh the user list after deletion
-            setUsers(users.filter(user => user._id !== userId));
-        } else {
-            alert(data.error || "Failed to delete user");
-        }
+      const data = await response.json();
+      if (response.ok) {
+        alert("User deleted successfully!");
+        // Refresh the user list after deletion
+        setUsers(users.filter(user => user._id !== userId));
+      } else {
+        alert(data.error || "Failed to delete user");
+      }
     } catch (error) {
-        console.error("Error deleting user:", error);
-        alert("An error occurred. Please try again.");
+      console.error("Error deleting user:", error);
+      alert("An error occurred. Please try again.");
     }
-};
+  };
 
 
   return (
@@ -199,7 +199,7 @@ const AdminPanel = () => {
         {selectedTab === "users" && (
           <section className="admin-users">
             <h2>User Management</h2>
-            
+
             {showCreateUser && (
               <CreateUser onClose={() => setShowCreateUser(false)} />
             )}
@@ -366,17 +366,24 @@ const AllTasks = ({
     <div className="MAIN_CONTENT">
       <p>Here you can manage tasks...</p>
 
+
       {/* Task Filters */}
       <div className="task-filters-admin">
         <label htmlFor="userFilter">Filter by User:</label>
-        <select id="userFilter" value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)}>
+
+        <select
+          id="userFilter"
+          value={selectedUser}
+          onChange={(e) => setSelectedUser(e.target.value)}
+        >
           <option value="">All Users</option>
-          {users.map((user) => (
-            <option key={user._id} value={user.username}>
+          {users.map((user, index) => (
+            <option key={user.id || index} value={user.username}>
               {user.username}
             </option>
           ))}
         </select>
+
 
         <button
           className={activeSection === "all" ? "active" : ""}
@@ -503,7 +510,8 @@ const AllTasks = ({
           .filter(
             (task) =>
               (activeSection === "all" || task.status === activeSection) &&
-              (selectedUser === "" || task.assignedTo === selectedUser) // Filter tasks based on active section and selected user
+              (selectedUser === "" ||
+                (Array.isArray(task.assignedTo) ? task.assignedTo.includes(selectedUser) : task.assignedTo === selectedUser))
           )
           .map((task) => (
             <div key={task.id} className="TASK_CARD">
@@ -563,7 +571,7 @@ const AllTasks = ({
                       className="DELETE_ICON"
                       onClick={() => deleteTask(task.id)}
                     />
-                  
+
                   </div>
                 </>
               )}
