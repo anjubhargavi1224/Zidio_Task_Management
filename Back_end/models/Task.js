@@ -28,11 +28,12 @@ const taskSchema = new mongoose.Schema({
         ref: "User",
         required: true
     },
-    assignedTo: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        default: null // Optional, only if assigned by admin
-    }
+    assignedTo: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ] // Now allows multiple users
 }, { timestamps: true });
 
 const Task = mongoose.model("Task", taskSchema);

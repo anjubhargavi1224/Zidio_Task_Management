@@ -15,7 +15,7 @@ router.post("/create", verifyToken, isAdmin, async (req, res) => {
             startDate,
             endDate,
             createdBy: req.user.id,
-            assignedTo: assignedTo || null, // If assignedTo is provided, it's assigned; otherwise, it's unassigned.
+            assignedTo: Array.isArray(assignedTo) && assignedTo.length > 0 ? assignedTo : [], // Ensures assignedTo is always an array
         });
 
         await newTask.save();
@@ -53,15 +53,22 @@ router.get("/", verifyToken, async (req, res) => {
     try {
         let tasks;
         if (req.user.role === "admin") {
-            tasks = await Task.find().populate("createdBy assignedTo", "username email");
+            // Admin: Fetch all tasks
+            tasks = await Task.find()
+                .populate("createdBy assignedTo", "username email")
+                .sort({ createdAt: -1 }); // Sort by most recent
         } else {
-            tasks = await Task.find({ assignedTo: req.user.id }).populate("createdBy assignedTo", "username email");
+            // User: Fetch only tasks assigned to them
+            tasks = await Task.find({ assignedTo: { $in: [req.user.id] } })
+                .populate("createdBy assignedTo", "username email")
+                .sort({ startDate: 1 }); // Sort by earliest start date
         }
         res.status(200).json(tasks);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // ✅ Update task status
 router.put("/update/status/:taskId", verifyToken, async (req, res) => {
@@ -71,8 +78,8 @@ router.put("/update/status/:taskId", verifyToken, async (req, res) => {
 
         if (!task) return res.status(404).json({ error: "Task not found" });
 
-        // Only the assigned user or admin can update status
-        if (req.user.id !== task.assignedTo.toString() && req.user.role !== "admin") {
+        // Only the assigned users or admin can update status
+        if (!task.assignedTo.map(id => id.toString()).includes(req.user.id) && req.user.role !== "admin") {
             return res.status(403).json({ error: "Unauthorized to update this task" });
         }
 
@@ -85,6 +92,7 @@ router.put("/update/status/:taskId", verifyToken, async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // ✅ Delete a task (only admin or task creator can delete)
 router.delete("/delete/:taskId", verifyToken, async (req, res) => {
