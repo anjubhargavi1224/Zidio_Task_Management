@@ -366,6 +366,7 @@ const handleUpdateTask = async () => {
     }
   }, [navigate]); // Run on component mount
 
+  console.log("User Details:", userDetails);
   return (
     <div className="task-container">
 
@@ -409,7 +410,7 @@ const handleUpdateTask = async () => {
           {/* Profile image with dropdown options */}
           <div className="profile-container">
             <img
-              src={user.profileImage}
+              src={user.profileImage || "https://static.vecteezy.com/system/resources/previews/000/439/863/non_2x/vector-users-icon.jpg" }
               alt="Profile"
               className="profile-pic"
               onClick={() => setShowProfileOptions(!showProfileOptions)}
