@@ -579,8 +579,8 @@ const AllTasks = ({
           All Tasks
         </button>
         <button
-          className={activeSection === "inProgress" ? "active" : ""}
-          onClick={() => setActiveSection("inProgress")}
+          className={activeSection === "in-progress" ? "active" : ""}
+          onClick={() => setActiveSection("in-progress")}
           id="in-progress"
         >
           In Progress
