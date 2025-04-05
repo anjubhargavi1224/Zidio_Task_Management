@@ -659,84 +659,84 @@ const AllTasks = ({
       )}
 
       <div className="TASK_GRID">
-        {tasks
-          .filter(
-            (task) =>
-              (activeSection === "all" || task.status === activeSection) &&
-              (selectedUser === "" ||
-                (Array.isArray(task.assignedTo)
-                  ? task.assignedTo.includes(selectedUser)
-                  : task.assignedTo === selectedUser))
-          )
-          .map((task,index) => (
-            <div key={task.id} className="TASK_CARD">
-              {editingTaskId === task._id ? (
-                <>
-                  <input
-                    type="text"
-                    name="title"
-                    value={editedTask.title}
-                    onChange={handleEditChange}
-                  />
-                  <textarea
-                    name="description"
-                    value={editedTask.description}
-                    onChange={handleEditChange}
-                  />
-                  <input
-                    type="date"
-                    name="startDate"
-                    value={editedTask.startDate}
-                    onChange={handleEditChange}
-                  />
-                  <input
-                    type="date"
-                    name="endDate"
-                    value={editedTask.endDate}
-                    onChange={handleEditChange}
-                  />
-                  <div className="TASK_ACTIONS">
-                    <FaSave
-                      className="SAVE_ICON"
-                      onClick={() => saveEdit(task._id)}
-                    />
-                    <button
-                      className="CANCEL_EDIT_BTN"
-                      onClick={() => setEditingTaskId(null)}
-                    >
-                      Cancel Edit
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h3>Title: {task.title}</h3>
-                  <p>Description: {task.description}</p>
-                  <p>
-                    Assigned To:{" "}
-                    {Array.isArray(task.assignedTo) &&
-                    task.assignedTo.length > 0
-                      ? task.assignedTo.map((user) => user.username).join(", ")
-                      : "Not Assigned"}
-                  </p>
+      {tasks
+  .filter(
+    (task) =>
+      (activeSection === "all" || task.status === activeSection) &&
+      (selectedUser === "" ||
+        (Array.isArray(task.assignedTo)
+          ? task.assignedTo.some((user) =>
+              typeof user === "string" ? user === selectedUser : user.username === selectedUser
+            )
+          : task.assignedTo === selectedUser))
+  )
+  .map((task, index) => (
+    <div key={task.id} className="TASK_CARD">
+      {editingTaskId === task._id ? (
+        <>
+          <input
+            type="text"
+            name="title"
+            value={editedTask.title}
+            onChange={handleEditChange}
+          />
+          <textarea
+            name="description"
+            value={editedTask.description}
+            onChange={handleEditChange}
+          />
+          <input
+            type="date"
+            name="startDate"
+            value={editedTask.startDate}
+            onChange={handleEditChange}
+          />
+          <input
+            type="date"
+            name="endDate"
+            value={editedTask.endDate}
+            onChange={handleEditChange}
+          />
+          <div className="TASK_ACTIONS">
+            <FaSave className="SAVE_ICON" onClick={() => saveEdit(task._id)} />
+            <button
+              className="CANCEL_EDIT_BTN"
+              onClick={() => setEditingTaskId(null)}
+            >
+              Cancel Edit
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <h3>Title: {task.title}</h3>
+          <p>Description: {task.description}</p>
+          <p>
+            Assigned To:{" "}
+            {Array.isArray(task.assignedTo) && task.assignedTo.length > 0
+              ? task.assignedTo
+                  .map((user) =>
+                    typeof user === "string" ? user : user.username
+                  )
+                  .join(", ")
+              : "Not Assigned"}
+          </p>
 
-                  <p className="TASK_DATE">
-                    Start: {task.startDate} | End: {task.endDate}
-                  </p>
-                  <div className="TASK_ACTIONS">
-                    <FaEdit
-                      className="EDIT_ICON"
-                      onClick={() => startEditing(task)}
-                    />
-                    <FaTrash
-                      className="DELETE_ICON"
-                      onClick={() => handleDeleteTask(task._id)}
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+          <p className="TASK_DATE">
+            Start: {task.startDate} | End: {task.endDate}
+          </p>
+          <div className="TASK_ACTIONS">
+            <FaEdit className="EDIT_ICON" onClick={() => startEditing(task)} />
+            <FaTrash
+              className="DELETE_ICON"
+              onClick={() => handleDeleteTask(task._id)}
+            />
+          </div>
+        </>
+      )}
+    </div>
+  ))}
+
       </div>
     </div>
   );
