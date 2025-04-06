@@ -101,9 +101,12 @@ const AdminPanel = () => {
     const filteredTasks = tasks.filter(
       (task) =>
         (activeSection === "all" || task.status === activeSection) &&
-        (selectedUser === "" ||
-          (Array.isArray(task.assignedTo) &&
-            task.assignedTo.includes(selectedUser))) // Safety check
+      (selectedUser === "" ||
+        (Array.isArray(task.assignedTo)
+          ? task.assignedTo.some((user) =>
+              typeof user === "string" ? user === selectedUser : user.username === selectedUser
+            )
+          : task.assignedTo === selectedUser))
     );
 
     const completedCount = filteredTasks.filter(
