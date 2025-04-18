@@ -488,6 +488,11 @@ const handleUpdateTask = async () => {
         >
           Completed
         </button>
+        <button
+          className="" onClick={() => navigate("/meet")}
+        >
+          Start your meeting
+        </button>
 
         {/* RadialBarChart */}
         <div className="CHART-CONTAINER">

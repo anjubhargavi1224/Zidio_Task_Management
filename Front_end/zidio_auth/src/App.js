@@ -5,6 +5,7 @@ import { AuthContextProvider } from "./context/AuthContextProvider";
 import AuthForm from "./components/AuthForm";
 import TaskManagement from "./components/TaskManagement";
 import AdminPanel from "./pages/AdminPanel";
+import MeetApp from "./components/MeetApp";
 
 // Function to check if user is an admin
 const isAdmin = () => {
@@ -32,6 +33,7 @@ function App() {
         <Routes>
           <Route path="/" element={<AuthForm />} />
           <Route path="/tasks" element={<TaskManagement />} />
+          <Route path="/meet" element={<MeetApp />} /> {/* ✅ Updated to use TaskManagement for meeting */}
           <Route path="/admin" element={<ProtectedRoute element={<AdminPanel />} />} />
         </Routes>
       </Router>

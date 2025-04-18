@@ -6,6 +6,7 @@ import {
   FaEdit,
   FaSave,
   FaTrash,
+  FaVideo,
   /*FaPlus*/
 } from "react-icons/fa";
 import { BarChart, Bar, XAxis, Tooltip, Legend } from "recharts";
@@ -218,6 +219,9 @@ const AdminPanel = () => {
           </li>
           <li onClick={() => setSelectedTab("tasks")}>
             <FaTasks /> Manage Tasks
+          </li>
+          <li onClick={() => navigate("/meet")}>
+            <FaVideo /> Start your Meeting
           </li>
         </ul>
 
