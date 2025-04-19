@@ -1,6 +1,8 @@
 // App.js
 import React, { useState } from "react";
 import Meet from "./Meet";
+import "./Meeting.css"; // assuming you name the CSS file Meeting.css
+
 
 function MeetApp() {
   const [roomName, setRoomName] = useState("");
@@ -16,34 +18,29 @@ function MeetApp() {
   };
 
   return (
-    <div style={{ padding: 20, height: '100vh' }}>
+    <div className="meeting-container">
       {!startMeeting ? (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100%"
-          }}
-        >
-          <h2>Start or Join ZidioMeet</h2>
+        <div className="meeting-start-box">
+          <h2>🚀 Start or Join <span className="zidio">ZidioMeet</span></h2>
+  
           <input
             type="text"
-            placeholder="Your Name"
+            placeholder="Enter your name"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            style={{ margin: "10px 0", padding: "8px", width: "250px" }}
+            className="meeting-input"
           />
+  
           <input
             type="text"
-            placeholder="Room Name"
+            placeholder="Enter room name"
             value={roomName}
             onChange={(e) => setRoomName(e.target.value)}
-            style={{ margin: "10px 0", padding: "8px", width: "250px" }}
+            className="meeting-input"
           />
-          <button onClick={handleStart} style={{ padding: "10px 20px" }}>
-            ZidioMeet
+  
+          <button onClick={handleStart} className="start-btn">
+            Join ZidioMeet
           </button>
         </div>
       ) : (

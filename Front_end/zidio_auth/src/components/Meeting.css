@@ -1,0 +1,83 @@
+.meeting-container {
+    padding: 20px;
+    height: 100vh;
+    width: 200vw;
+    background: linear-gradient(to bottom right, #000104, #174591);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .meeting-start-box {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .meeting-start-box h2 {
+    margin-bottom: 20px;
+    color: #1e40af;
+    font-size: 24px;
+  }
+  
+  .zidio {
+    color: #3b82f6;
+  }
+  
+  .meeting-input {
+    width: 90%;
+    padding: 10px 14px;
+    margin: 10px 0;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+    transition: 0.3s ease;
+  }
+  
+  .meeting-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  }
+  
+  .start-btn {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .start-btn:hover {
+    background-color: #2563eb;
+  }
+  
+  /* Responsive */
+  @media (max-width: 480px) {
+    .meeting-start-box {
+      padding: 25px 0px;
+    }
+  
+    .meeting-start-box h2 {
+      font-size: 20px;
+    }
+  
+    .meeting-input {
+      font-size: 14px;
+      width: 80%;
+    }
+  
+    .start-btn {
+      font-size: 14px;
+      padding: 10px 16px;
+    }
+  }
+  
