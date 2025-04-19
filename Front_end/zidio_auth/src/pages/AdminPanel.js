@@ -23,6 +23,28 @@ import {
   updateTaskStatus,
 } from "../services/taskService";
 
+import { FaCalendarAlt } from "react-icons/fa"; // Make sure react-icons is installed
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import enUS from 'date-fns/locale/en-US';
+import 'react-big-calendar/lib/css/react-big-calendar.css'; // Or 'dist' if needed
+
+const locales = {
+  'en-US': enUS,
+};
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
+
+
+
+
+
 const AdminPanel = () => {
   const [selectedTab, setSelectedTab] = useState("dashboard");
   const [activeSection, setActiveSection] = useState("all"); // State for task filtering
@@ -102,12 +124,12 @@ const AdminPanel = () => {
     const filteredTasks = tasks.filter(
       (task) =>
         (activeSection === "all" || task.status === activeSection) &&
-      (selectedUser === "" ||
-        (Array.isArray(task.assignedTo)
-          ? task.assignedTo.some((user) =>
+        (selectedUser === "" ||
+          (Array.isArray(task.assignedTo)
+            ? task.assignedTo.some((user) =>
               typeof user === "string" ? user === selectedUser : user.username === selectedUser
             )
-          : task.assignedTo === selectedUser))
+            : task.assignedTo === selectedUser))
     );
 
     const completedCount = filteredTasks.filter(
@@ -208,6 +230,73 @@ const AdminPanel = () => {
     }
   };
 
+
+  // State Variables
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState(null);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [showPopup, setShowPopup] = useState(false);
+
+  // 🆕 State for new event modal
+  const [newEventModalOpen, setNewEventModalOpen] = useState(false);
+  const [newEventData, setNewEventData] = useState({
+    title: "",
+    description: "",
+    start: null,
+    end: null,
+    eventType: "task",
+  });
+
+  // Handle slot selection to open new modal
+  const handleSelectSlot = ({ start, end }) => {
+    setNewEventData({ title: "", description: "", start, end, eventType: "task" });
+    setNewEventModalOpen(true);
+  };
+
+  // Handle click on calendar event
+  const handleEventClick = (event, e) => {
+    setCurrentEvent(event);
+    setPopupPosition({ x: e.clientX, y: e.clientY });
+    setShowPopup(true);
+  };
+
+  // Open modal from popup
+  const handleEditEvent = () => {
+    setShowPopup(false);
+    setShowModal(true);
+  };
+
+  // Save event changes
+  const handleSaveEvent = () => {
+    const updatedEvent = {
+      ...currentEvent,
+      color: currentEvent.eventType === "meeting" ? "#3b82f6" : "#34d399"
+    };
+
+    const updatedEvents = events.map((e) =>
+      e.id === updatedEvent.id ? updatedEvent : e
+    );
+    setEvents(updatedEvents);
+    setShowModal(false);
+  };
+
+  // Delete event
+  const handleDeleteEvent = () => {
+    const confirmed = window.confirm("Are you sure you want to delete this event?");
+    if (confirmed) {
+      const updatedEvents = events.filter((e) => e.id !== currentEvent.id);
+      setEvents(updatedEvents);
+      setShowModal(false);
+      setShowPopup(false);
+    }
+  };
+
+
+
+
+
   return (
     <div className="admin-container">
       {/* Sidebar */}
@@ -250,7 +339,161 @@ const AdminPanel = () => {
       <div className="admin-content">
         <header className="admin-header">
           <h1>Dashboard</h1>
+          <button
+            className="calendar-btn"
+            onClick={() => setShowCalendar(true)}
+            title="Open Calendar"
+          >
+            <FaCalendarAlt size={22} />
+          </button>
         </header>
+
+        {showCalendar && (
+        <div className="calendar-modal">
+          <div className="calendar-content">
+            <button className="close-btnn" onClick={() => setShowCalendar(false)}>X</button>
+            <Calendar
+              localizer={localizer}
+              events={events}
+              startAccessor="start"
+              endAccessor="end"
+              style={{ height: 500, margin: "20px" }}
+              selectable
+              popup
+              onSelectSlot={handleSelectSlot}
+              onSelectEvent={(event, e) => handleEventClick(event, e)}
+              eventPropGetter={(event) => ({
+                style: {
+                  backgroundColor: event.color || '#6366f1',
+                  color: 'white',
+                  borderRadius: '5px',
+                  border: 'none',
+                  padding: '4px',
+                },
+              })}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 🆕 New Event Modal */}
+      {newEventModalOpen && (
+        <div className="modal">
+          <h3>Create New Event</h3>
+          <input
+            type="text"
+            placeholder="Enter title"
+            value={newEventData.title}
+            onChange={(e) => setNewEventData({ ...newEventData, title: e.target.value })}
+          />
+          <textarea
+            placeholder="Enter description"
+            value={newEventData.description}
+            onChange={(e) => setNewEventData({ ...newEventData, description: e.target.value })}
+          />
+          <p><strong>Start:</strong> {new Date(newEventData.start).toLocaleDateString("en-GB", {
+            day: "2-digit", month: "short", year: "numeric"
+          })}</p>
+
+          <label>Event Type:</label>
+          <select
+            value={newEventData.eventType}
+            onChange={(e) =>
+              setNewEventData({ ...newEventData, eventType: e.target.value })
+            }
+          >
+            <option value="meeting">Meeting</option>
+            <option value="task">Task</option>
+          </select>
+
+          <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+            <button
+              onClick={() => {
+                const color =
+                  newEventData.eventType === "meeting" ? "#3b82f6" : "#34d399";
+                const newEvent = {
+                  ...newEventData,
+                  id: Date.now(),
+                  start: new Date(newEventData.start),
+                  end: new Date(newEventData.end),
+                  color
+                };
+                setEvents([...events, newEvent]);
+                setNewEventModalOpen(false);
+              }}
+            >
+              Add Event
+            </button>
+            <button onClick={() => setNewEventModalOpen(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {showModal && currentEvent && (
+        <div className="modal">
+          <h3>Edit Event</h3>
+          <input
+            type="text"
+            value={currentEvent.title}
+            onChange={(e) => setCurrentEvent({ ...currentEvent, title: e.target.value })}
+          />
+          <textarea
+            value={currentEvent.description || ""}
+            onChange={(e) => setCurrentEvent({ ...currentEvent, description: e.target.value })}
+          />
+          <p><strong>Start:</strong> {new Date(currentEvent.start).toLocaleDateString("en-GB", {
+            day: "2-digit", month: "short", year: "numeric"
+          })}</p>
+
+          <label>Event Type:</label>
+          <select
+            value={currentEvent.eventType}
+            onChange={(e) => setCurrentEvent({ ...currentEvent, eventType: e.target.value })}
+          >
+            <option value="meeting">Meeting</option>
+            <option value="task">Task</option>
+          </select>
+
+          <button onClick={handleSaveEvent}>Save Changes</button>
+          <button onClick={handleDeleteEvent}>Delete Event</button>
+          <button onClick={() => setShowModal(false)}>Cancel</button>
+        </div>
+      )}
+
+      {/* Event Details Popup */}
+      {currentEvent && showPopup && (
+        <div
+          className="event-popup"
+          style={{
+            position: "absolute",
+            top: popupPosition.y + 10,
+            zIndex: 999,
+            backgroundColor: "#fff",
+            border: "1px solid #ccc",
+            padding: "10px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+          }}
+        >
+          <h3><strong>Title:</strong>{currentEvent.title}</h3>
+          <p><strong>Description:</strong>{currentEvent.description}</p>
+          <p><strong>Start:</strong> {new Date(currentEvent.start).toLocaleDateString("en-GB", {
+            day: "2-digit", month: "short", year: "numeric"
+          })}</p>
+          <p>
+            <strong>Type:</strong>{" "}
+            <span style={{ color: currentEvent.color }}>{currentEvent.eventType}</span>
+          </p>
+          <div className="popup-buttons" style={{ display: "flex", gap: "10px" }}>
+            <button className="edit-btn" onClick={handleEditEvent}>Edit</button>
+            <button className="delete-btn" onClick={handleDeleteEvent}>Delete</button>
+            <button className="close-btnn" onClick={() => setShowPopup(false)}>Close</button>
+          </div>
+        </div>
+      )}
+
+
 
         {/* Conditional Rendering Based on Selected Tab */}
         <section className="admin-stats">
@@ -547,15 +790,15 @@ const AllTasks = ({
 
   // Save edited task
   const saveEdit = async (taskId) => {
-      try {
-        await updateTaskDetails(taskId, editedTask, token); // Send update to backend
-        fetchTasks(); // Refresh tasks from backend
-        setEditingTaskId(null);
-      } catch (error) {
-        console.error("Error saving task", error);
-      }
-    };
-  
+    try {
+      await updateTaskDetails(taskId, editedTask, token); // Send update to backend
+      fetchTasks(); // Refresh tasks from backend
+      setEditingTaskId(null);
+    } catch (error) {
+      console.error("Error saving task", error);
+    }
+  };
+
 
   return (
     <div className="MAIN_CONTENT">
@@ -666,83 +909,83 @@ const AllTasks = ({
       )}
 
       <div className="TASK_GRID">
-      {tasks
-  .filter(
-    (task) =>
-      (activeSection === "all" || task.status === activeSection) &&
-      (selectedUser === "" ||
-        (Array.isArray(task.assignedTo)
-          ? task.assignedTo.some((user) =>
-              typeof user === "string" ? user === selectedUser : user.username === selectedUser
-            )
-          : task.assignedTo === selectedUser))
-  )
-  .map((task, index) => (
-    <div key={task.id} className="TASK_CARD">
-      {editingTaskId === task._id ? (
-        <>
-          <input
-            type="text"
-            name="title"
-            value={editedTask.title}
-            onChange={handleEditChange}
-          />
-          <textarea
-            name="description"
-            value={editedTask.description}
-            onChange={handleEditChange}
-          />
-          <input
-            type="date"
-            name="startDate"
-            value={editedTask.startDate}
-            onChange={handleEditChange}
-          />
-          <input
-            type="date"
-            name="endDate"
-            value={editedTask.endDate}
-            onChange={handleEditChange}
-          />
-          <div className="TASK_ACTIONS">
-            <FaSave className="SAVE_ICON" onClick={() => saveEdit(task._id)} />
-            <button
-              className="CANCEL_EDIT_BTN"
-              onClick={() => setEditingTaskId(null)}
-            >
-              Cancel Edit
-            </button>
-          </div>
-        </>
-      ) : (
-        <>
-          <h3>Title: {task.title}</h3>
-          <p>Description: {task.description}</p>
-          <p>
-            Assigned To:{" "}
-            {Array.isArray(task.assignedTo) && task.assignedTo.length > 0
-              ? task.assignedTo
-                  .map((user) =>
-                    typeof user === "string" ? user : user.username
+        {tasks
+          .filter(
+            (task) =>
+              (activeSection === "all" || task.status === activeSection) &&
+              (selectedUser === "" ||
+                (Array.isArray(task.assignedTo)
+                  ? task.assignedTo.some((user) =>
+                    typeof user === "string" ? user === selectedUser : user.username === selectedUser
                   )
-                  .join(", ")
-              : "Not Assigned"}
-          </p>
+                  : task.assignedTo === selectedUser))
+          )
+          .map((task, index) => (
+            <div key={task.id} className="TASK_CARD">
+              {editingTaskId === task._id ? (
+                <>
+                  <input
+                    type="text"
+                    name="title"
+                    value={editedTask.title}
+                    onChange={handleEditChange}
+                  />
+                  <textarea
+                    name="description"
+                    value={editedTask.description}
+                    onChange={handleEditChange}
+                  />
+                  <input
+                    type="date"
+                    name="startDate"
+                    value={editedTask.startDate}
+                    onChange={handleEditChange}
+                  />
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={editedTask.endDate}
+                    onChange={handleEditChange}
+                  />
+                  <div className="TASK_ACTIONS">
+                    <FaSave className="SAVE_ICON" onClick={() => saveEdit(task._id)} />
+                    <button
+                      className="CANCEL_EDIT_BTN"
+                      onClick={() => setEditingTaskId(null)}
+                    >
+                      Cancel Edit
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h3>Title: {task.title}</h3>
+                  <p>Description: {task.description}</p>
+                  <p>
+                    Assigned To:{" "}
+                    {Array.isArray(task.assignedTo) && task.assignedTo.length > 0
+                      ? task.assignedTo
+                        .map((user) =>
+                          typeof user === "string" ? user : user.username
+                        )
+                        .join(", ")
+                      : "Not Assigned"}
+                  </p>
 
-          <p className="TASK_DATE">
-            Start: {task.startDate} | End: {task.endDate}
-          </p>
-          <div className="TASK_ACTIONS">
-            <FaEdit className="EDIT_ICON" onClick={() => startEditing(task)} />
-            <FaTrash
-              className="DELETE_ICON"
-              onClick={() => handleDeleteTask(task._id)}
-            />
-          </div>
-        </>
-      )}
-    </div>
-  ))}
+                  <p className="TASK_DATE">
+                    Start: {task.startDate} | End: {task.endDate}
+                  </p>
+                  <div className="TASK_ACTIONS">
+                    <FaEdit className="EDIT_ICON" onClick={() => startEditing(task)} />
+                    <FaTrash
+                      className="DELETE_ICON"
+                      onClick={() => handleDeleteTask(task._id)}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
 
       </div>
     </div>

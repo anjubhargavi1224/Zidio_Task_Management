@@ -14,7 +14,25 @@ import { RadialBarChart, RadialBar, Tooltip } from "recharts";
 import { useNavigate } from "react-router-dom";
 import UpdateProfile from './UpdateProfile'; // Import the UpdateProfile component
 import { AuthContext } from "../context/AuthContextProvider";
-import { updateTaskDetails, getTasks, createTask, createSelfTask, deleteTask, updateTaskStatus  } from "../services/taskService";
+import { updateTaskDetails, getTasks, createTask, createSelfTask, deleteTask, updateTaskStatus } from "../services/taskService";
+
+import { FaCalendarAlt } from "react-icons/fa"; // Make sure react-icons is installed
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import enUS from 'date-fns/locale/en-US';
+import 'react-big-calendar/lib/css/react-big-calendar.css'; // Or 'dist' if needed
+
+const locales = {
+  'en-US': enUS,
+};
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
 
 
 
@@ -38,108 +56,108 @@ const TaskManagement = () => {
   const [newNotifications, setNewNotifications] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
-  const{user} = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [taskData, setTaskData] = useState({ title: "", description: "", startDate: "", endDate: "", assignedTo: "" });
-  const API_URL = "http://localhost:5000/tasks"; 
-  
-const token = localStorage.getItem("token");
+  const API_URL = "http://localhost:5000/tasks";
+
+  const token = localStorage.getItem("token");
 
 
-///////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////
 
   useEffect(() => {
     fetchTasks();
-}, []);
- const fetchTasks = async () => {
-  try {
+  }, []);
+  const fetchTasks = async () => {
+    try {
       const response = await getTasks(token);
       setTasks(response);
-  } catch (error) {
+    } catch (error) {
       console.error("Error fetching tasks", error);
-  }
-};
-const handleChange = (e) => {
-  setTaskData({ ...taskData, [e.target.name]: e.target.value });
-};
-//////////////////////////////////////////////
-//working perfectly
+    }
+  };
+  const handleChange = (e) => {
+    setTaskData({ ...taskData, [e.target.name]: e.target.value });
+  };
+  //////////////////////////////////////////////
+  //working perfectly
 
-const handleCreateTask = async () => {
-  try {
+  const handleCreateTask = async () => {
+    try {
       if (user.role === "admin") {
-          await createTask(taskData, token);
+        await createTask(taskData, token);
       } else {
-          await createSelfTask(taskData, token);
+        await createSelfTask(taskData, token);
       }
       fetchTasks();
       setShowForm(false);
-  } catch (error) {
+    } catch (error) {
       console.error("Error creating task", error);
-  }
-};
+    }
+  };
 
-///////////////////////////////////////////////
-//working perfectly
+  ///////////////////////////////////////////////
+  //working perfectly
 
-const handleDeleteTask = async (taskId) => {
-  try {
+  const handleDeleteTask = async (taskId) => {
+    try {
       await deleteTask(taskId, token);
       fetchTasks();
-  } catch (error) {
+    } catch (error) {
       console.error("Error deleting task", error);
-  }
-};
-
-
-//////////////////////////////////////////////////////
- // Mark a task as completed
- const completeTask = async (taskId) => {
-  try {
-    // Update task status in backend
-    await handleUpdateStatus(taskId, "completed");
-
-    // Optimistically update local state
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task._id === taskId ? { ...task, status: "completed" } : task
-      )
-    );
-
-    // Find completed task for notification
-    const completedTask = tasks.find((task) => task._id === taskId);
-    if (completedTask) {
-      addNotification(`Task "${completedTask.title}" has been completed!`);
     }
-  } catch (error) {
-    console.error("Error completing task:", error);
-  }
-};
-
-const handleUpdateStatus = async (taskId, status) => {
-  try {
-    await updateTaskStatus(taskId, status, token);
-    fetchTasks(); // Ensure tasks are updated from the backend
-  } catch (error) {
-    console.error("Error updating status", error);
-  }
-};
+  };
 
 
+  //////////////////////////////////////////////////////
+  // Mark a task as completed
+  const completeTask = async (taskId) => {
+    try {
+      // Update task status in backend
+      await handleUpdateStatus(taskId, "completed");
+
+      // Optimistically update local state
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task._id === taskId ? { ...task, status: "completed" } : task
+        )
+      );
+
+      // Find completed task for notification
+      const completedTask = tasks.find((task) => task._id === taskId);
+      if (completedTask) {
+        addNotification(`Task "${completedTask.title}" has been completed!`);
+      }
+    } catch (error) {
+      console.error("Error completing task:", error);
+    }
+  };
+
+  const handleUpdateStatus = async (taskId, status) => {
+    try {
+      await updateTaskStatus(taskId, status, token);
+      fetchTasks(); // Ensure tasks are updated from the backend
+    } catch (error) {
+      console.error("Error updating status", error);
+    }
+  };
 
 
-//////////////////////////////////////////////////////////////
 
-const handleUpdateTask = async () => {
-  if (!editingTaskId) return;
 
-  try {
+  //////////////////////////////////////////////////////////////
+
+  const handleUpdateTask = async () => {
+    if (!editingTaskId) return;
+
+    try {
       await updateTaskDetails(editingTaskId, editedTask, token);
       fetchTasks(); // Refresh task list
       setEditingTaskId(null);
-  } catch (error) {
+    } catch (error) {
       console.error("Error updating task", error);
-  }
-};
+    }
+  };
 
 
 
@@ -147,7 +165,7 @@ const handleUpdateTask = async () => {
 
 
 
-//////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
 
   // User details state
   const [userDetails, setUserDetails] = useState(() => {
@@ -164,27 +182,27 @@ const handleUpdateTask = async () => {
 
   useEffect(() => {
     const fetchUserDetails = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            const response = await fetch(`http://localhost:5000/auth/users`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`http://localhost:5000/auth/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-            const users = await response.json();
-            const loggedInUser = users.find((u) => u.email === user.email);
-            console.log(user);
+        const users = await response.json();
+        const loggedInUser = users.find((u) => u.email === user.email);
+        console.log(user);
 
-            if (loggedInUser) {
-                setUserDetails(loggedInUser);
-                localStorage.setItem("userDetails", JSON.stringify(loggedInUser));
-            }
-        } catch (error) {
-            console.error("Error fetching user details:", error);
+        if (loggedInUser) {
+          setUserDetails(loggedInUser);
+          localStorage.setItem("userDetails", JSON.stringify(loggedInUser));
         }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
     };
 
     fetchUserDetails();
-}, []);
+  }, []);
 
   const avatarURL = userDetails.profilePic;
 
@@ -207,7 +225,7 @@ const handleUpdateTask = async () => {
     status: "",
   });
 
-  
+
 
   // State for search query
   const [searchQuery, setSearchQuery] = useState("");
@@ -223,7 +241,7 @@ const handleUpdateTask = async () => {
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     const today = new Date().toISOString().split("T")[0];
-  
+
     setNewTask((prevTask) => {
       if (name === "startDate") {
         if (value < today) {
@@ -235,7 +253,7 @@ const handleUpdateTask = async () => {
           return { ...prevTask, startDate: value, endDate: "" };
         }
       }
-  
+
       if (name === "endDate") {
         if (!prevTask.startDate) {
           alert("Please select a Start Date first!");
@@ -246,11 +264,11 @@ const handleUpdateTask = async () => {
           return prevTask;
         }
       }
-  
+
       return { ...prevTask, [name]: value };
     });
   };
-  
+
 
   // Add a new task to the task list
   const addTask = async () => {
@@ -278,7 +296,7 @@ const handleUpdateTask = async () => {
     }
   };
 
- 
+
 
   // Start editing a specific task
   const startEditing = (task) => {
@@ -291,7 +309,7 @@ const handleUpdateTask = async () => {
       status: task.status,
     });
   };
-  
+
 
   // Handle input changes while editing a task
   const handleEditChange = (e) => {
@@ -319,7 +337,7 @@ const handleUpdateTask = async () => {
     { name: "Pending", value: tasks.filter(task => task.status !== "completed").length, fill: "#EF4444" },
   ];
 
- 
+
 
   const clearNotifications = () => {
     const userId = userDetails.email; // Assuming user ID is based on email for simplicity
@@ -367,6 +385,74 @@ const handleUpdateTask = async () => {
   }, [navigate]); // Run on component mount
 
   console.log("User Details:", userDetails);
+
+
+
+// State Variables
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState(null);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [showPopup, setShowPopup] = useState(false);
+
+  // 🆕 State for new event modal
+  const [newEventModalOpen, setNewEventModalOpen] = useState(false);
+  const [newEventData, setNewEventData] = useState({
+    title: "",
+    description: "",
+    start: null,
+    end: null,
+    eventType: "task",
+  });
+
+  // Handle slot selection to open new modal
+  const handleSelectSlot = ({ start, end }) => {
+    setNewEventData({ title: "", description: "", start, end, eventType: "task" });
+    setNewEventModalOpen(true);
+  };
+
+  // Handle click on calendar event
+  const handleEventClick = (event, e) => {
+    setCurrentEvent(event);
+    setPopupPosition({ x: e.clientX, y: e.clientY });
+    setShowPopup(true);
+  };
+
+  // Open modal from popup
+  const handleEditEvent = () => {
+    setShowPopup(false);
+    setShowModal(true);
+  };
+
+  // Save event changes
+  const handleSaveEvent = () => {
+    const updatedEvent = {
+      ...currentEvent,
+      color: currentEvent.eventType === "meeting" ? "#3b82f6" : "#34d399"
+    };
+
+    const updatedEvents = events.map((e) =>
+      e.id === updatedEvent.id ? updatedEvent : e
+    );
+    setEvents(updatedEvents);
+    setShowModal(false);
+  };
+
+  // Delete event
+  const handleDeleteEvent = () => {
+    const confirmed = window.confirm("Are you sure you want to delete this event?");
+    if (confirmed) {
+      const updatedEvents = events.filter((e) => e.id !== currentEvent.id);
+      setEvents(updatedEvents);
+      setShowModal(false);
+      setShowPopup(false);
+    }
+  };
+
+
+
+
   return (
     <div className="task-container">
 
@@ -384,8 +470,166 @@ const handleUpdateTask = async () => {
           />
         </div>
 
+        
+        
+        
+
         {/* Profile and notification section */}
         <div className="profile-section">
+          <>
+          <button
+          className="calendar-btnn"
+          onClick={() => setShowCalendar(true)}
+          title="Open Calendar"
+        >
+          <FaCalendarAlt size={22} />
+        </button>
+
+        {showCalendar && (
+                <div className="calendar-modal">
+                  <div className="calendar-content">
+                    <button className="close-btnn" onClick={() => setShowCalendar(false)}>X</button>
+                    <Calendar
+                      localizer={localizer}
+                      events={events}
+                      startAccessor="start"
+                      endAccessor="end"
+                      style={{ height: 500, margin: "20px" }}
+                      selectable
+                      popup
+                      onSelectSlot={handleSelectSlot}
+                      onSelectEvent={(event, e) => handleEventClick(event, e)}
+                      eventPropGetter={(event) => ({
+                        style: {
+                          backgroundColor: event.color || '#6366f1',
+                          color: 'white',
+                          borderRadius: '5px',
+                          border: 'none',
+                          padding: '4px',
+                        },
+                      })}
+                    />
+                  </div>
+                </div>
+              )}
+        
+              {/* 🆕 New Event Modal */}
+              {newEventModalOpen && (
+                <div className="modal">
+                  <h3>Create New Event</h3>
+                  <input
+                    type="text"
+                    placeholder="Enter title"
+                    value={newEventData.title}
+                    onChange={(e) => setNewEventData({ ...newEventData, title: e.target.value })}
+                  />
+                  <textarea
+                    placeholder="Enter description"
+                    value={newEventData.description}
+                    onChange={(e) => setNewEventData({ ...newEventData, description: e.target.value })}
+                  />
+                  <p><strong>Start:</strong> {new Date(newEventData.start).toLocaleDateString("en-GB", {
+                    day: "2-digit", month: "short", year: "numeric"
+                  })}</p>
+        
+                  <label>Event Type:</label>
+                  <select
+                    value={newEventData.eventType}
+                    onChange={(e) =>
+                      setNewEventData({ ...newEventData, eventType: e.target.value })
+                    }
+                  >
+                    <option value="meeting">Meeting</option>
+                    <option value="task">Task</option>
+                  </select>
+        
+                  <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                    <button
+                      onClick={() => {
+                        const color =
+                          newEventData.eventType === "meeting" ? "#3b82f6" : "#34d399";
+                        const newEvent = {
+                          ...newEventData,
+                          id: Date.now(),
+                          start: new Date(newEventData.start),
+                          end: new Date(newEventData.end),
+                          color
+                        };
+                        setEvents([...events, newEvent]);
+                        setNewEventModalOpen(false);
+                      }}
+                    >
+                      Add Event
+                    </button>
+                    <button onClick={() => setNewEventModalOpen(false)}>Cancel</button>
+                  </div>
+                </div>
+              )}
+        
+              {/* Edit Modal */}
+              {showModal && currentEvent && (
+                <div className="modal">
+                  <h3>Edit Event</h3>
+                  <input
+                    type="text"
+                    value={currentEvent.title}
+                    onChange={(e) => setCurrentEvent({ ...currentEvent, title: e.target.value })}
+                  />
+                  <textarea
+                    value={currentEvent.description || ""}
+                    onChange={(e) => setCurrentEvent({ ...currentEvent, description: e.target.value })}
+                  />
+                  <p><strong>Start:</strong> {new Date(currentEvent.start).toLocaleDateString("en-GB", {
+                    day: "2-digit", month: "short", year: "numeric"
+                  })}</p>
+        
+                  <label>Event Type:</label>
+                  <select
+                    value={currentEvent.eventType}
+                    onChange={(e) => setCurrentEvent({ ...currentEvent, eventType: e.target.value })}
+                  >
+                    <option value="meeting">Meeting</option>
+                    <option value="task">Task</option>
+                  </select>
+        
+                  <button onClick={handleSaveEvent}>Save Changes</button>
+                  <button onClick={handleDeleteEvent}>Delete Event</button>
+                  <button onClick={() => setShowModal(false)}>Cancel</button>
+                </div>
+              )}
+        
+              {/* Event Details Popup */}
+              {currentEvent && showPopup && (
+                <div
+                  className="event-popup"
+                  style={{
+                    position: "absolute",
+                    top: popupPosition.y + 10,
+                    zIndex: 999,
+                    backgroundColor: "#fff",
+                    border: "1px solid #ccc",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  <h3><strong>Title:</strong>{currentEvent.title}</h3>
+                  <p><strong>Description:</strong>{currentEvent.description}</p>
+                  <p><strong>Start:</strong> {new Date(currentEvent.start).toLocaleDateString("en-GB", {
+                    day: "2-digit", month: "short", year: "numeric"
+                  })}</p>
+                  <p>
+                    <strong>Type:</strong>{" "}
+                    <span style={{ color: currentEvent.color }}>{currentEvent.eventType}</span>
+                  </p>
+                  <div className="popup-buttons" style={{ display: "flex", gap: "10px" }}>
+                    <button className="edit-btn" onClick={handleEditEvent}>Edit</button>
+                    <button className="delete-btn" onClick={handleDeleteEvent}>Delete</button>
+                    <button className="close-btnn" onClick={() => setShowPopup(false)}>Close</button>
+                  </div>
+                </div>
+              )}
+        </>
           <div className="notification-container">
             {/* Notification Bell Icon */}
             <div className="notification-icon" onClick={() => setShowNotifications(!showNotifications)}>
@@ -410,7 +654,7 @@ const handleUpdateTask = async () => {
           {/* Profile image with dropdown options */}
           <div className="profile-container">
             <img
-              src={user.profileImage || "https://static.vecteezy.com/system/resources/previews/000/439/863/non_2x/vector-users-icon.jpg" }
+              src={user.profileImage || "https://static.vecteezy.com/system/resources/previews/000/439/863/non_2x/vector-users-icon.jpg"}
               alt="Profile"
               className="profile-pic"
               onClick={() => setShowProfileOptions(!showProfileOptions)}
@@ -539,25 +783,25 @@ const handleUpdateTask = async () => {
               type="text"
               name="title"
               placeholder="Title"
-              
+
               onChange={handleChange}
             />
             <textarea
               name="description"
               placeholder="Description"
-              
+
               onChange={handleChange}
             ></textarea>
             <input
               type="date"
               name="startDate"
-              
+
               onChange={handleChange}
             />
             <input
               type="date"
               name="endDate"
-              
+
               onChange={handleChange}
             />
             <div className="task-form-buttons">
@@ -588,7 +832,7 @@ const handleUpdateTask = async () => {
               (activeSection === "all" || task.status === activeSection) &&
               task.title.toLowerCase().includes(searchQuery.toLowerCase())
             )
-            .map((task,index) => (
+            .map((task, index) => (
               <div key={task.id} className="task-card">
                 {editingTaskId === task._id ? (
                   <>
