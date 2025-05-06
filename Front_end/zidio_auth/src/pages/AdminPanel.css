@@ -722,3 +722,12 @@ button:hover {
       flex-direction: column;
     }
     }
+
+
+    .view-icon {
+      color: #007bff;
+      cursor: pointer;
+      font-size: 18px;
+      margin-left: 10px;
+      padding-bottom: 4px;
+    }

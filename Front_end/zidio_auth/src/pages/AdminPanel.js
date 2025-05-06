@@ -7,8 +7,11 @@ import {
   FaSave,
   FaTrash,
   FaVideo,
+  FaEye,
   /*FaPlus*/
 } from "react-icons/fa";
+import { RadialBarChart, RadialBar } from "recharts";
+
 import { BarChart, Bar, XAxis, Tooltip, Legend } from "recharts";
 import CreateUser from "./CreateUser"; // Import the CreateUser  component
 import "./AdminPanel.css";
@@ -40,7 +43,6 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
-
 
 
 
@@ -349,149 +351,149 @@ const AdminPanel = () => {
         </header>
 
         {showCalendar && (
-        <div className="calendar-modal">
-          <div className="calendar-content">
-            <button className="close-btnn" onClick={() => setShowCalendar(false)}>X</button>
-            <Calendar
-              localizer={localizer}
-              events={events}
-              startAccessor="start"
-              endAccessor="end"
-              style={{ height: 500, margin: "20px" }}
-              selectable
-              popup
-              onSelectSlot={handleSelectSlot}
-              onSelectEvent={(event, e) => handleEventClick(event, e)}
-              eventPropGetter={(event) => ({
-                style: {
-                  backgroundColor: event.color || '#6366f1',
-                  color: 'white',
-                  borderRadius: '5px',
-                  border: 'none',
-                  padding: '4px',
-                },
-              })}
+          <div className="calendar-modal">
+            <div className="calendar-content">
+              <button className="close-btnn" onClick={() => setShowCalendar(false)}>X</button>
+              <Calendar
+                localizer={localizer}
+                events={events}
+                startAccessor="start"
+                endAccessor="end"
+                style={{ height: 500, margin: "20px" }}
+                selectable
+                popup
+                onSelectSlot={handleSelectSlot}
+                onSelectEvent={(event, e) => handleEventClick(event, e)}
+                eventPropGetter={(event) => ({
+                  style: {
+                    backgroundColor: event.color || '#6366f1',
+                    color: 'white',
+                    borderRadius: '5px',
+                    border: 'none',
+                    padding: '4px',
+                  },
+                })}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* 🆕 New Event Modal */}
+        {newEventModalOpen && (
+          <div className="modal">
+            <h3>Create New Event</h3>
+            <input
+              type="text"
+              placeholder="Enter title"
+              value={newEventData.title}
+              onChange={(e) => setNewEventData({ ...newEventData, title: e.target.value })}
             />
-          </div>
-        </div>
-      )}
+            <textarea
+              placeholder="Enter description"
+              value={newEventData.description}
+              onChange={(e) => setNewEventData({ ...newEventData, description: e.target.value })}
+            />
+            <p><strong>Start:</strong> {new Date(newEventData.start).toLocaleDateString("en-GB", {
+              day: "2-digit", month: "short", year: "numeric"
+            })}</p>
 
-      {/* 🆕 New Event Modal */}
-      {newEventModalOpen && (
-        <div className="modal">
-          <h3>Create New Event</h3>
-          <input
-            type="text"
-            placeholder="Enter title"
-            value={newEventData.title}
-            onChange={(e) => setNewEventData({ ...newEventData, title: e.target.value })}
-          />
-          <textarea
-            placeholder="Enter description"
-            value={newEventData.description}
-            onChange={(e) => setNewEventData({ ...newEventData, description: e.target.value })}
-          />
-          <p><strong>Start:</strong> {new Date(newEventData.start).toLocaleDateString("en-GB", {
-            day: "2-digit", month: "short", year: "numeric"
-          })}</p>
-
-          <label>Event Type:</label>
-          <select
-            value={newEventData.eventType}
-            onChange={(e) =>
-              setNewEventData({ ...newEventData, eventType: e.target.value })
-            }
-          >
-            <option value="meeting">Meeting</option>
-            <option value="task">Task</option>
-          </select>
-
-          <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-            <button
-              onClick={() => {
-                const color =
-                  newEventData.eventType === "meeting" ? "#3b82f6" : "#34d399";
-                const newEvent = {
-                  ...newEventData,
-                  id: Date.now(),
-                  start: new Date(newEventData.start),
-                  end: new Date(newEventData.end),
-                  color
-                };
-                setEvents([...events, newEvent]);
-                setNewEventModalOpen(false);
-              }}
+            <label>Event Type:</label>
+            <select
+              value={newEventData.eventType}
+              onChange={(e) =>
+                setNewEventData({ ...newEventData, eventType: e.target.value })
+              }
             >
-              Add Event
-            </button>
-            <button onClick={() => setNewEventModalOpen(false)}>Cancel</button>
+              <option value="meeting">Meeting</option>
+              <option value="task">Task</option>
+            </select>
+
+            <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+              <button
+                onClick={() => {
+                  const color =
+                    newEventData.eventType === "meeting" ? "#3b82f6" : "#34d399";
+                  const newEvent = {
+                    ...newEventData,
+                    id: Date.now(),
+                    start: new Date(newEventData.start),
+                    end: new Date(newEventData.end),
+                    color
+                  };
+                  setEvents([...events, newEvent]);
+                  setNewEventModalOpen(false);
+                }}
+              >
+                Add Event
+              </button>
+              <button onClick={() => setNewEventModalOpen(false)}>Cancel</button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Edit Modal */}
-      {showModal && currentEvent && (
-        <div className="modal">
-          <h3>Edit Event</h3>
-          <input
-            type="text"
-            value={currentEvent.title}
-            onChange={(e) => setCurrentEvent({ ...currentEvent, title: e.target.value })}
-          />
-          <textarea
-            value={currentEvent.description || ""}
-            onChange={(e) => setCurrentEvent({ ...currentEvent, description: e.target.value })}
-          />
-          <p><strong>Start:</strong> {new Date(currentEvent.start).toLocaleDateString("en-GB", {
-            day: "2-digit", month: "short", year: "numeric"
-          })}</p>
+        {/* Edit Modal */}
+        {showModal && currentEvent && (
+          <div className="modal">
+            <h3>Edit Event</h3>
+            <input
+              type="text"
+              value={currentEvent.title}
+              onChange={(e) => setCurrentEvent({ ...currentEvent, title: e.target.value })}
+            />
+            <textarea
+              value={currentEvent.description || ""}
+              onChange={(e) => setCurrentEvent({ ...currentEvent, description: e.target.value })}
+            />
+            <p><strong>Start:</strong> {new Date(currentEvent.start).toLocaleDateString("en-GB", {
+              day: "2-digit", month: "short", year: "numeric"
+            })}</p>
 
-          <label>Event Type:</label>
-          <select
-            value={currentEvent.eventType}
-            onChange={(e) => setCurrentEvent({ ...currentEvent, eventType: e.target.value })}
+            <label>Event Type:</label>
+            <select
+              value={currentEvent.eventType}
+              onChange={(e) => setCurrentEvent({ ...currentEvent, eventType: e.target.value })}
+            >
+              <option value="meeting">Meeting</option>
+              <option value="task">Task</option>
+            </select>
+
+            <button onClick={handleSaveEvent}>Save Changes</button>
+            <button onClick={handleDeleteEvent}>Delete Event</button>
+            <button onClick={() => setShowModal(false)}>Cancel</button>
+          </div>
+        )}
+
+        {/* Event Details Popup */}
+        {currentEvent && showPopup && (
+          <div
+            className="event-popup"
+            style={{
+              position: "absolute",
+              top: popupPosition.y + 10,
+              zIndex: 999,
+              backgroundColor: "#fff",
+              border: "1px solid #ccc",
+              padding: "10px",
+              borderRadius: "8px",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+            }}
           >
-            <option value="meeting">Meeting</option>
-            <option value="task">Task</option>
-          </select>
-
-          <button onClick={handleSaveEvent}>Save Changes</button>
-          <button onClick={handleDeleteEvent}>Delete Event</button>
-          <button onClick={() => setShowModal(false)}>Cancel</button>
-        </div>
-      )}
-
-      {/* Event Details Popup */}
-      {currentEvent && showPopup && (
-        <div
-          className="event-popup"
-          style={{
-            position: "absolute",
-            top: popupPosition.y + 10,
-            zIndex: 999,
-            backgroundColor: "#fff",
-            border: "1px solid #ccc",
-            padding: "10px",
-            borderRadius: "8px",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-          }}
-        >
-          <h3><strong>Title:</strong>{currentEvent.title}</h3>
-          <p><strong>Description:</strong>{currentEvent.description}</p>
-          <p><strong>Start:</strong> {new Date(currentEvent.start).toLocaleDateString("en-GB", {
-            day: "2-digit", month: "short", year: "numeric"
-          })}</p>
-          <p>
-            <strong>Type:</strong>{" "}
-            <span style={{ color: currentEvent.color }}>{currentEvent.eventType}</span>
-          </p>
-          <div className="popup-buttons" style={{ display: "flex", gap: "10px" }}>
-            <button className="edit-btn" onClick={handleEditEvent}>Edit</button>
-            <button className="delete-btn" onClick={handleDeleteEvent}>Delete</button>
-            <button className="close-btnn" onClick={() => setShowPopup(false)}>Close</button>
+            <h3><strong>Title:</strong>{currentEvent.title}</h3>
+            <p><strong>Description:</strong>{currentEvent.description}</p>
+            <p><strong>Start:</strong> {new Date(currentEvent.start).toLocaleDateString("en-GB", {
+              day: "2-digit", month: "short", year: "numeric"
+            })}</p>
+            <p>
+              <strong>Type:</strong>{" "}
+              <span style={{ color: currentEvent.color }}>{currentEvent.eventType}</span>
+            </p>
+            <div className="popup-buttons" style={{ display: "flex", gap: "10px" }}>
+              <button className="edit-btn" onClick={handleEditEvent}>Edit</button>
+              <button className="delete-btn" onClick={handleDeleteEvent}>Delete</button>
+              <button className="close-btnn" onClick={() => setShowPopup(false)}>Close</button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
 
 
@@ -798,6 +800,35 @@ const AllTasks = ({
       console.error("Error saving task", error);
     }
   };
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  // Handle task click to show modal
+  const handleTaskClick = (task) => {
+    setSelectedTask(task);
+    setShowTaskModal(true);
+  };
+
+
+  const updateTaskProgress = (taskId, newProgress) => {
+    setTasks(prevTasks =>
+      prevTasks.map(task => {
+        if (task._id === taskId) {
+          const currentProgress = task.progress || 0;
+          if (newProgress > currentProgress) {
+            return {
+              ...task,
+              progress: parseInt(newProgress),
+              status: parseInt(newProgress) === 100 ? 'completed' : task.status,
+            };
+          } else {
+            return task; // no change if decreased
+          }
+        } else {
+          return task;
+        }
+      })
+    );
+  };
 
 
   return (
@@ -908,6 +939,85 @@ const AllTasks = ({
         </div>
       )}
 
+      {showTaskModal && selectedTask && (
+        <div className="task-modal-backdrop">
+          <div className="task-modal-new">
+            <button className="modal-close" onClick={() => setShowTaskModal(false)}>×</button>
+            <h3 className="modal-title">Task Details</h3>
+
+            <label>Title</label>
+            <input
+              type="text"
+              value={selectedTask.title || ""}
+              onChange={(e) =>
+                setSelectedTask({ ...selectedTask, title: e.target.value })
+              }
+              placeholder="This is a title"
+              className="modal-input"
+            />
+
+            <label>Description</label>
+            <textarea
+              value={selectedTask.description || ""}
+              onChange={(e) =>
+                setSelectedTask({ ...selectedTask, description: e.target.value })
+              }
+              placeholder="Enter description"
+              className="modal-textarea"
+            />
+
+            <div className="assignment-info">
+              <p>
+                <strong>Assigned to:</strong>{" "}
+                {selectedTask.assignedTo?.length > 0 ? (
+                  selectedTask.assignedTo.map((user, index) => (
+                    <span key={index} className="assigned-user">{user.username}</span>
+                  ))
+                ) : (
+                  <span>None</span>
+                )}
+              </p>
+              <p>
+                <strong>Assigned by:</strong> {selectedTask.assignedBy?.username || "Unknown"}
+              </p>
+            </div>
+
+            {selectedTask.assignedTo?.length > 0 && (
+              <div className="progress-section">
+                <h4>Individual Progress</h4>
+                <div className="progress-charts">
+                  {selectedTask.assignedTo.map((user, index) => {
+                    const progressValue = user.progress || 0;
+                    const colors = ["#00C49F", "#FFBB28", "#8884D8", "#FF8042", "#4CAF50"];
+                    const chartData = [
+                      { name: user.username, value: progressValue, fill: colors[index % colors.length] }
+                    ];
+                    return (
+                      <div key={index} className="user-chart">
+                        <RadialBarChart
+                          width={140}
+                          height={140}
+                          innerRadius="60%"
+                          outerRadius="90%"
+                          data={chartData}
+                          startAngle={180}
+                          endAngle={0}
+                        >
+                          <RadialBar background dataKey="value" />
+                        </RadialBarChart>
+                        <p className="chart-label">{user.username}</p>
+                        <p className="chart-percentage">{progressValue}%</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+
       <div className="TASK_GRID">
         {tasks
           .filter(
@@ -980,6 +1090,10 @@ const AllTasks = ({
                     <FaTrash
                       className="DELETE_ICON"
                       onClick={() => handleDeleteTask(task._id)}
+                    />
+                    <FaEye
+                      className="view-icon"
+                      onClick={() => handleTaskClick(task)}
                     />
                   </div>
                 </>

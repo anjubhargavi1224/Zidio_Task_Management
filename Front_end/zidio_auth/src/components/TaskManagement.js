@@ -8,6 +8,11 @@ import {
   FaCheck,
   FaUser,
   FaSignOutAlt,
+  FaEye,
+  // FaTimes,
+  // FaCalendarDay,
+  // FaLock,
+  // FaThumbtack,
 } from "react-icons/fa";
 import "./TaskManagement.css";
 import { RadialBarChart, RadialBar, Tooltip } from "recharts";
@@ -64,6 +69,9 @@ const TaskManagement = () => {
 
 
   ///////////////////////////////////////////////////////////////////////////////////
+  // State for task modal
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
     fetchTasks();
@@ -91,10 +99,15 @@ const TaskManagement = () => {
       }
       fetchTasks();
       setShowForm(false);
+
+      // Add this line to show notification when task created:
+      addNotification(`New task "${taskData.title}" has been created!`);
+
     } catch (error) {
       console.error("Error creating task", error);
     }
   };
+
 
   ///////////////////////////////////////////////
   //working perfectly
@@ -348,12 +361,13 @@ const TaskManagement = () => {
   };
 
   const addNotification = (message) => {
-    const userId = userDetails.email; // Assuming user ID is based on email for simplicity
-    const userNotifications = JSON.parse(localStorage.getItem(`notifications_${userId}`)) || [];
-    userNotifications.push(message);
-    localStorage.setItem(`notifications_${userId}`, JSON.stringify(userNotifications));
-    setNotifications(userNotifications);
-    setNewNotifications(userNotifications.length);
+    const newNotification = {
+      id: Date.now(),
+      message: message,
+      timestamp: new Date(),
+    };
+    setNotifications(prev => [...prev, newNotification]);
+    setNewNotifications(prev => prev + 1);
   };
 
   // Calculate completed and pending counts
@@ -388,7 +402,7 @@ const TaskManagement = () => {
 
 
 
-// State Variables
+  // State Variables
   const [showCalendar, setShowCalendar] = useState(false);
   const [events, setEvents] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -450,6 +464,34 @@ const TaskManagement = () => {
     }
   };
 
+  // Handle task click to show modal
+  const handleTaskClick = (task) => {
+    setSelectedTask(task);
+    setShowTaskModal(true);
+  };
+
+
+  const updateTaskProgress = (taskId, newProgress) => {
+    setTasks(prevTasks =>
+      prevTasks.map(task => {
+        if (task._id === taskId) {
+          const currentProgress = task.progress || 0;
+          if (newProgress > currentProgress) {
+            return {
+              ...task,
+              progress: parseInt(newProgress),
+              status: parseInt(newProgress) === 100 ? 'completed' : task.status,
+            };
+          } else {
+            return task; // no change if decreased
+          }
+        } else {
+          return task;
+        }
+      })
+    );
+  };
+
 
 
 
@@ -470,166 +512,162 @@ const TaskManagement = () => {
           />
         </div>
 
-        
-        
-        
-
         {/* Profile and notification section */}
         <div className="profile-section">
           <>
-          <button
-          className="calendar-btnn"
-          onClick={() => setShowCalendar(true)}
-          title="Open Calendar"
-        >
-          <FaCalendarAlt size={22} />
-        </button>
+            <button
+              className="calendar-btnn"
+              onClick={() => setShowCalendar(true)}
+              title="Open Calendar"
+            >
+              <FaCalendarAlt size={22} />
+            </button>
 
-        {showCalendar && (
-                <div className="calendar-modal">
-                  <div className="calendar-content">
-                    <button className="close-btnn" onClick={() => setShowCalendar(false)}>X</button>
-                    <Calendar
-                      localizer={localizer}
-                      events={events}
-                      startAccessor="start"
-                      endAccessor="end"
-                      style={{ height: 500, margin: "20px" }}
-                      selectable
-                      popup
-                      onSelectSlot={handleSelectSlot}
-                      onSelectEvent={(event, e) => handleEventClick(event, e)}
-                      eventPropGetter={(event) => ({
-                        style: {
-                          backgroundColor: event.color || '#6366f1',
-                          color: 'white',
-                          borderRadius: '5px',
-                          border: 'none',
-                          padding: '4px',
-                        },
-                      })}
-                    />
-                  </div>
+            {showCalendar && (
+              <div className="calendar-modal">
+                <div className="calendar-content">
+                  <button className="close-btnn" onClick={() => setShowCalendar(false)}>X</button>
+                  <Calendar
+                    localizer={localizer}
+                    events={events}
+                    startAccessor="start"
+                    endAccessor="end"
+                    style={{ height: 500, margin: "20px" }}
+                    selectable
+                    popup
+                    onSelectSlot={handleSelectSlot}
+                    onSelectEvent={(event, e) => handleEventClick(event, e)}
+                    eventPropGetter={(event) => ({
+                      style: {
+                        backgroundColor: event.color || '#6366f1',
+                        color: 'white',
+                        borderRadius: '5px',
+                        border: 'none',
+                        padding: '4px',
+                      },
+                    })}
+                  />
                 </div>
-              )}
-        
-              {/* 🆕 New Event Modal */}
-              {newEventModalOpen && (
-                <div className="modal">
-                  <h3>Create New Event</h3>
-                  <input
-                    type="text"
-                    placeholder="Enter title"
-                    value={newEventData.title}
-                    onChange={(e) => setNewEventData({ ...newEventData, title: e.target.value })}
-                  />
-                  <textarea
-                    placeholder="Enter description"
-                    value={newEventData.description}
-                    onChange={(e) => setNewEventData({ ...newEventData, description: e.target.value })}
-                  />
-                  <p><strong>Start:</strong> {new Date(newEventData.start).toLocaleDateString("en-GB", {
-                    day: "2-digit", month: "short", year: "numeric"
-                  })}</p>
-        
-                  <label>Event Type:</label>
-                  <select
-                    value={newEventData.eventType}
-                    onChange={(e) =>
-                      setNewEventData({ ...newEventData, eventType: e.target.value })
-                    }
-                  >
-                    <option value="meeting">Meeting</option>
-                    <option value="task">Task</option>
-                  </select>
-        
-                  <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-                    <button
-                      onClick={() => {
-                        const color =
-                          newEventData.eventType === "meeting" ? "#3b82f6" : "#34d399";
-                        const newEvent = {
-                          ...newEventData,
-                          id: Date.now(),
-                          start: new Date(newEventData.start),
-                          end: new Date(newEventData.end),
-                          color
-                        };
-                        setEvents([...events, newEvent]);
-                        setNewEventModalOpen(false);
-                      }}
-                    >
-                      Add Event
-                    </button>
-                    <button onClick={() => setNewEventModalOpen(false)}>Cancel</button>
-                  </div>
-                </div>
-              )}
-        
-              {/* Edit Modal */}
-              {showModal && currentEvent && (
-                <div className="modal">
-                  <h3>Edit Event</h3>
-                  <input
-                    type="text"
-                    value={currentEvent.title}
-                    onChange={(e) => setCurrentEvent({ ...currentEvent, title: e.target.value })}
-                  />
-                  <textarea
-                    value={currentEvent.description || ""}
-                    onChange={(e) => setCurrentEvent({ ...currentEvent, description: e.target.value })}
-                  />
-                  <p><strong>Start:</strong> {new Date(currentEvent.start).toLocaleDateString("en-GB", {
-                    day: "2-digit", month: "short", year: "numeric"
-                  })}</p>
-        
-                  <label>Event Type:</label>
-                  <select
-                    value={currentEvent.eventType}
-                    onChange={(e) => setCurrentEvent({ ...currentEvent, eventType: e.target.value })}
-                  >
-                    <option value="meeting">Meeting</option>
-                    <option value="task">Task</option>
-                  </select>
-        
-                  <button onClick={handleSaveEvent}>Save Changes</button>
-                  <button onClick={handleDeleteEvent}>Delete Event</button>
-                  <button onClick={() => setShowModal(false)}>Cancel</button>
-                </div>
-              )}
-        
-              {/* Event Details Popup */}
-              {currentEvent && showPopup && (
-                <div
-                  className="event-popup"
-                  style={{
-                    position: "absolute",
-                    top: popupPosition.y + 10,
-                    zIndex: 999,
-                    backgroundColor: "#fff",
-                    border: "1px solid #ccc",
-                    padding: "10px",
-                    borderRadius: "8px",
-                    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-                  }}
+              </div>
+            )}
+
+            {/* 🆕 New Event Modal */}
+            {newEventModalOpen && (
+              <div className="modal">
+                <h3>Create New Event</h3>
+                <input
+                  type="text"
+                  placeholder="Enter title"
+                  value={newEventData.title}
+                  onChange={(e) => setNewEventData({ ...newEventData, title: e.target.value })}
+                />
+                <textarea
+                  placeholder="Enter description"
+                  value={newEventData.description}
+                  onChange={(e) => setNewEventData({ ...newEventData, description: e.target.value })}
+                />
+                <p><strong>Start:</strong> {new Date(newEventData.start).toLocaleDateString("en-GB", {
+                  day: "2-digit", month: "short", year: "numeric"
+                })}</p>
+
+                <label>Event Type:</label>
+                <select
+                  value={newEventData.eventType}
+                  onChange={(e) =>
+                    setNewEventData({ ...newEventData, eventType: e.target.value })
+                  }
                 >
-                  <h3><strong>Title:</strong>{currentEvent.title}</h3>
-                  <p><strong>Description:</strong>{currentEvent.description}</p>
-                  <p><strong>Start:</strong> {new Date(currentEvent.start).toLocaleDateString("en-GB", {
-                    day: "2-digit", month: "short", year: "numeric"
-                  })}</p>
-                  <p>
-                    <strong>Type:</strong>{" "}
-                    <span style={{ color: currentEvent.color }}>{currentEvent.eventType}</span>
-                  </p>
-                  <div className="popup-buttons" style={{ display: "flex", gap: "10px" }}>
-                    <button className="edit-btn" onClick={handleEditEvent}>Edit</button>
-                    <button className="delete-btn" onClick={handleDeleteEvent}>Delete</button>
-                    <button className="close-btnn" onClick={() => setShowPopup(false)}>Close</button>
-                  </div>
+                  <option value="meeting">Meeting</option>
+                  <option value="task">Task</option>
+                </select>
+
+                <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                  <button
+                    onClick={() => {
+                      const color =
+                        newEventData.eventType === "meeting" ? "#3b82f6" : "#34d399";
+                      const newEvent = {
+                        ...newEventData,
+                        id: Date.now(),
+                        start: new Date(newEventData.start),
+                        end: new Date(newEventData.end),
+                        color
+                      };
+                      setEvents([...events, newEvent]);
+                      setNewEventModalOpen(false);
+                    }}
+                  >
+                    Add Event
+                  </button>
+                  <button onClick={() => setNewEventModalOpen(false)}>Cancel</button>
                 </div>
-              )}
-        </>
+              </div>
+            )}
+
+            {/* Edit Modal */}
+            {showModal && currentEvent && (
+              <div className="modal">
+                <h3>Edit Event</h3>
+                <input
+                  type="text"
+                  value={currentEvent.title}
+                  onChange={(e) => setCurrentEvent({ ...currentEvent, title: e.target.value })}
+                />
+                <textarea
+                  value={currentEvent.description || ""}
+                  onChange={(e) => setCurrentEvent({ ...currentEvent, description: e.target.value })}
+                />
+                <p><strong>Start:</strong> {new Date(currentEvent.start).toLocaleDateString("en-GB", {
+                  day: "2-digit", month: "short", year: "numeric"
+                })}</p>
+
+                <label>Event Type:</label>
+                <select
+                  value={currentEvent.eventType}
+                  onChange={(e) => setCurrentEvent({ ...currentEvent, eventType: e.target.value })}
+                >
+                  <option value="meeting">Meeting</option>
+                  <option value="task">Task</option>
+                </select>
+
+                <button onClick={handleSaveEvent}>Save Changes</button>
+                <button onClick={handleDeleteEvent}>Delete Event</button>
+                <button onClick={() => setShowModal(false)}>Cancel</button>
+              </div>
+            )}
+
+            {/* Event Details Popup */}
+            {currentEvent && showPopup && (
+              <div
+                className="event-popup"
+                style={{
+                  position: "absolute",
+                  top: popupPosition.y + 10,
+                  zIndex: 999,
+                  backgroundColor: "#fff",
+                  border: "1px solid #ccc",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                }}
+              >
+                <h3><strong>Title:</strong>{currentEvent.title}</h3>
+                <p><strong>Description:</strong>{currentEvent.description}</p>
+                <p><strong>Start:</strong> {new Date(currentEvent.start).toLocaleDateString("en-GB", {
+                  day: "2-digit", month: "short", year: "numeric"
+                })}</p>
+                <p>
+                  <strong>Type:</strong>{" "}
+                  <span style={{ color: currentEvent.color }}>{currentEvent.eventType}</span>
+                </p>
+                <div className="popup-buttons" style={{ display: "flex", gap: "10px" }}>
+                  <button className="edit-btn" onClick={handleEditEvent}>Edit</button>
+                  <button className="delete-btn" onClick={handleDeleteEvent}>Delete</button>
+                  <button className="close-btnn" onClick={() => setShowPopup(false)}>Close</button>
+                </div>
+              </div>
+            )}
+          </>
           <div className="notification-container">
             {/* Notification Bell Icon */}
             <div className="notification-icon" onClick={() => setShowNotifications(!showNotifications)}>
@@ -640,8 +678,10 @@ const TaskManagement = () => {
             {showNotifications && (
               <div className="notification-dropdown">
                 {notifications.length > 0 ? (
-                  notifications.map((note, index) => (
-                    <div key={index} className="notification-item">{note}</div>
+                  notifications.map((note) => (
+                    <div key={note.id} className="notification-item">
+                      {note.message}
+                    </div>
                   ))
                 ) : (
                   <p className="no-notifications">No new notifications</p>
@@ -825,6 +865,85 @@ const TaskManagement = () => {
           />
         )}
 
+        {showTaskModal && selectedTask && (
+          <div className="task-modal-backdrop">
+            <div className="task-modal-new">
+              <button className="modal-close" onClick={() => setShowTaskModal(false)}>×</button>
+              <h3 className="modal-title">Task Details</h3>
+
+              <label>Title</label>
+              <input
+                type="text"
+                value={selectedTask.title || ""}
+                onChange={(e) =>
+                  setSelectedTask({ ...selectedTask, title: e.target.value })
+                }
+                placeholder="This is a title"
+                className="modal-input"
+              />
+
+              <label>Description</label>
+              <textarea
+                value={selectedTask.description || ""}
+                onChange={(e) =>
+                  setSelectedTask({ ...selectedTask, description: e.target.value })
+                }
+                placeholder="Enter description"
+                className="modal-textarea"
+              />
+
+              <div className="assignment-info">
+                <p>
+                  <strong>Assigned to:</strong>{" "}
+                  {selectedTask.assignedTo?.length > 0 ? (
+                    selectedTask.assignedTo.map((user, index) => (
+                      <span key={index} className="assigned-user">{user.username}</span>
+                    ))
+                  ) : (
+                    <span>None</span>
+                  )}
+                </p>
+                <p>
+                  <strong>Assigned by:</strong> {selectedTask.assignedBy?.username || "Unknown"}
+                </p>
+              </div>
+
+              {selectedTask.assignedTo?.length > 0 && (
+                <div className="progress-section">
+                  <h4>Individual Progress</h4>
+                  <div className="progress-charts">
+                    {selectedTask.assignedTo.map((user, index) => {
+                      const progressValue = user.progress || 0;
+                      const colors = ["#00C49F", "#FFBB28", "#8884D8", "#FF8042", "#4CAF50"];
+                      const chartData = [
+                        { name: user.username, value: progressValue, fill: colors[index % colors.length] }
+                      ];
+                      return (
+                        <div key={index} className="user-chart">
+                          <RadialBarChart
+                            width={140}
+                            height={140}
+                            innerRadius="60%"
+                            outerRadius="90%"
+                            data={chartData}
+                            startAngle={180}
+                            endAngle={0}
+                          >
+                            <RadialBar background dataKey="value" />
+                          </RadialBarChart>
+                          <p className="chart-label">{user.username}</p>
+                          <p className="chart-percentage">{progressValue}%</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+
         {/* Display Tasks */}
         <div className="task-grid">
           {tasks
@@ -833,7 +952,10 @@ const TaskManagement = () => {
               task.title.toLowerCase().includes(searchQuery.toLowerCase())
             )
             .map((task, index) => (
-              <div key={task.id} className="task-card">
+              <div key={task.id}
+                className="task-card"
+                style={{ cursor: "pointer" }}>
+
                 {editingTaskId === task._id ? (
                   <>
                     <input type="text" name="title" value={editedTask.title} onChange={handleEditChange} />
@@ -851,22 +973,103 @@ const TaskManagement = () => {
                     <p>Description: {task.description}</p>
                     <p className="task-date">Start: {task.startDate} | End: {task.endDate}</p>
                     <div className="task-actions">
-                      <FaEdit className="edit-icon" onClick={() => startEditing(task)} />
-                      <FaTrash className="delete-icon" onClick={() => handleDeleteTask(task._id)} />
-                      {task.status !== "completed" && (
-                        <button className="complete-btn" onClick={() => completeTask(task._id)}>
-                          <FaCheck className="complete-icon" /> Complete
-                        </button>
+                      <div className="task-actions-icon">
+                        <FaEdit
+                          className="edit-icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            startEditing(task);
+                          }}
+                        />
+                        <FaTrash
+                          className="delete-icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteTask(task._id);
+                          }}
+                        />
+                        <FaEye
+                          className="view-icon"
+                          onClick={() => handleTaskClick(task)}
+                        />
+                      </div>
+
+                      {typeof task.progress === "number" && task.progress >= 0 ? (
+                        <>
+                          {/* Progress Container */}
+                          <div className="progress-container">
+                            {/* Percentage Display */}
+                            {task.progress < 100 && (
+                              <div className="percentage-display">
+                                {task.progress}% completed
+                              </div>
+                            )}
+
+                            {/* Range Slider */}
+                            {task.progress < 100 && (
+                              <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={task.progress}
+                                onChange={(e) => {
+                                  const newValue = parseInt(e.target.value);
+                                  if (newValue > task.progress) {
+                                    updateTaskProgress(task._id, newValue);
+                                  }
+                                }}
+                                className="progress-slider"
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            )}
+                          </div>
+
+                          {/* Green Tick Mark when Task is Completed */}
+                          {task.progress === 100 && (
+                            <FaCheck
+                              className="complete-check"
+                              style={{ color: "green", fontSize: "1.5em", marginLeft: "10px" }}
+                            />
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {/* Progress Container */}
+                          <div className="progress-container">
+                            {/* Range Slider when progress is undefined */}
+                            <input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={0}
+                              onChange={(e) => {
+                                const newValue = parseInt(e.target.value);
+                                updateTaskProgress(task._id, newValue);
+                              }}
+                              className="progress-slider"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+
+                            {/* Percentage Display */}
+                            <div className="percentage-display">
+                              0% completed
+                            </div>
+                          </div>
+                        </>
                       )}
+
+
                     </div>
                   </>
-                )}
-              </div>
-            ))}
-        </div>
 
+                 
+            )}
+        </div>
+            ))}
       </div>
+
     </div>
+    </div >
   );
 };
 

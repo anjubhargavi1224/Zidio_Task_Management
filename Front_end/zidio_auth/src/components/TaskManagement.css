@@ -423,8 +423,7 @@
 .task-card textarea,
 .task-card input[type="datetime-local"] {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 8px;
+ 
   border: 1px solid #ccc;
   border-radius: 5px;
   word-wrap: break-word;
@@ -443,9 +442,10 @@
 /* Task Actions */
 .task-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 10px;
   margin-top: auto;
+  align-items: center;
 }
 
 /* Icons */
@@ -774,4 +774,174 @@
   }
 
 
+}
+
+
+.task-modal-backdrop {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  overflow: auto;
+}
+
+.task-modal-new {
+  position: relative;
+  background: #fff;
+  border-radius: 10px;
+  padding: 30px;
+  width: 100%;
+  max-width: 800px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  max-height: 95vh;
+  overflow-y: auto;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  font-weight: bold;
+}
+
+.modal-title {
+  color: #00bcd4;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.modal-input,
+.modal-textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  resize: vertical;
+}
+
+.assignment-info {
+  margin-bottom: 20px;
+  font-size: 15px;
+  color: #444;
+}
+
+.assigned-user {
+  background-color: #e6f7ff;
+  color: #007acc;
+  padding: 5px 10px;
+  margin: 5px 5px 5px 0;
+  border-radius: 6px;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.progress-section {
+  margin-top: 30px;
+}
+
+.progress-section h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.progress-charts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: flex-start;
+}
+
+.user-chart {
+  text-align: center;
+  width: 140px;
+}
+
+.chart-label {
+  font-size: 14px;
+  color: #333;
+  margin-top: 5px;
+}
+
+.chart-percentage {
+  font-size: 15px;
+  font-weight: 600;
+  color: #00bcd4;
+}
+
+
+
+.view-icon {
+  color: #007bff;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 10px;
+  padding-top: 4px;
+}
+
+/* Container for slider and percentage display */
+.progress-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Range Slider */
+.progress-slider {
+  width: 80%; /* Adjust the width of the slider */
+  height: 5px; /* Height of the slider */
+  border-radius: 5px;
+  background-color: #eee;
+  transition: all 0.2s ease;
+}
+
+/* Change color of the slider progress */
+.progress-slider::-webkit-slider-runnable-track {
+  background: #ddd;
+  border-radius: 5px;
+}
+
+.progress-slider::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4caf50;
+  cursor: pointer;
+  border: 2px solid #2c6b33;
+}
+
+.progress-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4caf50;
+  cursor: pointer;
+  border: 2px solid #2c6b33;
+}
+
+/* Percentage display on top of the slider */
+.percentage-display {
+  position: absolute;
+  top: -3px; /* Adjust to place it above the slider */
+  font-size: 14px;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
 }
